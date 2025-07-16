@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, viewport-fit=cover'/>
+<title>Cinefilos - Movie Wheel Spinner</title>
+
+<!-- PWA Meta Tags -->
+<meta name="description" content="Spin the wheel to pick a movie and get recommendations! A fun way to decide what to watch.">
+<meta name="keywords" content="movie, wheel, spinner, recommendations, cinema, film">
+<meta name="author" content="Cinefilos">
+<meta name="robots" content="index, follow">
+
+<!-- Theme and Color Meta Tags -->
+<meta name="theme-color" content="#1a1a2e">
+<meta name="msapplication-navbutton-color" content="#1a1a2e">
+<meta name="msapplication-TileColor" content="#1a1a2e">
+
+<!-- iOS Specific Meta Tags -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cinefilos">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="format-detection" content="telephone=no">
+
+<!-- iOS Icons -->
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="apple-touch-icon" sizes="57x57" href="icon-57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="icon-60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="icon-72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="icon-76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="icon-114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icon-120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="icon-144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+
+<!-- iOS Splash Screens -->
+<link rel="apple-touch-startup-image" href="splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)">
+<link rel="apple-touch-startup-image" href="splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)">
+<link rel="apple-touch-startup-image" href="splash-1536x2048.png" media="(min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2)">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Standard Icons -->
+<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="icon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="shortcut icon" href="favicon.ico">
+
+<!-- Microsoft Tiles -->
+<meta name="msapplication-TileImage" content="icon-144.png">
+<meta name="msapplication-config" content="browserconfig.xml">
+
+<!-- Mobile Web App Capable -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Cinefilos">
+
+<!-- Preconnect for Performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.omdbapi.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- External Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+
+<style>
+   /* Keyframe Animations */
+   @keyframes glowing-border {
+       0% { box-shadow: 0 0 10px rgba(102, 187, 255, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.05); }
+       50% { box-shadow: 0 0 20px rgba(102, 187, 255, 0.7), inset 0 0 25px rgba(255, 255, 255, 0.1); }
+       100% { box-shadow: 0 0 10px rgba(102, 187, 255, 0.4), inset 0 0 15px rgba(255, 255, 255, 0.05); }
+   }
+
+   @keyframes confetti-fall {
+       0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+       100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+   }
+
+   @keyframes fadeInOut {
+       0% { opacity: 0; transform: translateY(-20px); }
+       10% { opacity: 1; transform: translateY(0); }
+       90% { opacity: 1; transform: translateY(0); }
+       100% { opacity: 0; transform: translateY(-20px); }
+   }
+
+   @keyframes slideInFromTop {
+       0% { transform: translateY(-100%); opacity: 0; }
+       100% { transform: translateY(0); opacity: 1; }
+   }
+
+   /* General Body Styling */
+   body {
+       background: radial-gradient(circle at top left, #1a1a2e 0%, #0f0f1a 100%); /* Deeper, dynamic background */
+       color: #e0e0e0;
+       font-family: 'Inter', sans-serif;
+       text-align: center;
+       padding: 20px;
+       margin: 0;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       min-height: 100vh;
+       box-sizing: border-box;
+       line-height: 1.6;
+       overflow-x: hidden; /* Prevent horizontal scroll from animations */
+       /* PWA safe area support for iOS */
+       padding-top: max(20px, env(safe-area-inset-top));
+       padding-bottom: max(20px, env(safe-area-inset-bottom));
+       padding-left: max(20px, env(safe-area-inset-left));
+       padding-right: max(20px, env(safe-area-inset-right));
+   }
+
+   h1 {
+       /* Banner Styling for H1 */
+       background: linear-gradient(90deg, #34495e, #1a1a2e, #34495e); /* Gradient banner */
+       color: #ffffff;
+       padding: 15px 20px;
+       margin: calc(-1 * max(20px, env(safe-area-inset-top))) calc(-1 * max(20px, env(safe-area-inset-right))) 20px calc(-1 * max(20px, env(safe-area-inset-left))); /* Adjust margin to span full width and touch top/sides */
+       width: calc(100% + max(40px, env(safe-area-inset-left) + env(safe-area-inset-right))); /* Account for body padding */
+       font-weight: 700;
+       font-size: 2.2em; /* Larger font for banner */
+       letter-spacing: 1px;
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Shadow for banner effect */
+       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for depth */
+       position: relative; /* For z-index if needed */
+       z-index: 5; /* Ensure it's above general content but below needle */
+   }
+
+   h2 {
+       color: #ffffff;
+       margin-bottom: 15px;
+       font-weight: 600;
+   }
+
+   /* PWA Install Banner */
+   #pwa-install-banner {
+       position: fixed;
+       top: 0;
+       left: 0;
+       right: 0;
+       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+       color: white;
+       padding: 12px 20px;
+       text-align: center;
+       z-index: 1000;
+       transform: translateY(-100%);
+       transition: transform 0.3s ease-in-out;
+       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+   }
+
+   #pwa-install-banner.show {
+       transform: translateY(0);
+       animation: slideInFromTop 0.5s ease-out;
+   }
+
+   #pwa-install-banner button {
+       background: rgba(255, 255, 255, 0.2);
+       border: 1px solid rgba(255, 255, 255, 0.3);
+       color: white;
+       padding: 8px 16px;
+       border-radius: 20px;
+       margin: 0 5px;
+       cursor: pointer;
+       font-size: 14px;
+       transition: background 0.3s ease;
+   }
+
+   #pwa-install-banner button:hover {
+       background: rgba(255, 255, 255, 0.3);
+   }
+
+   /* Needle Styling */
+   #needle {
+       width: 0;
+       height: 0;
+       margin: 0 auto;
+       border-left: 20px solid transparent; /* Slightly wider */
+       border-right: 20px solid transparent; /* Slightly wider */
+       border-bottom: 40px solid #e74c3c; /* Taller */
+       position: relative;
+       top: 25px; /* Adjust position for taller needle */
+       filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.7)); /* Stronger shadow */
+       z-index: 10;
+   }
+
+   /* 3D Wheel Container */
+   #wheel3d {
+       position: relative;
+       margin: 30px auto;
+       width: 320px;
+       height: 320px;
+       border-radius: 50%;
+       border: 8px solid #3a3a5e;
+       overflow: hidden;
+       transform-style: preserve-3d;
+       transition: transform 4s ease-out;
+       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.05);
+       z-index: 1;
+       animation: glowing-border 3s infinite alternate ease-in-out; /* Glowing animation */
+   }
+
+   /* Slice Styling */
+   .slice {
+       position: absolute;
+       width: 50%;
+       height: 50%;
+       background-color: #3498db; /* Default fallback color */
+       background-size: cover;
+       background-position: center;
+       color: white; /* Text color, though no text now */
+       display: flex; /* Kept flex for potential future content */
+       justify-content: flex-end;
+       align-items: center;
+       transform-origin: 100% 100%;
+       clip-path: polygon(100% 100%, 0 100%, 100% 0);
+       border-right: 1px solid rgba(0, 0, 0, 0.2);
+       box-sizing: border-box;
+       padding-right: 8px;
+       overflow: hidden;
+       /* Added overlay for better poster visibility */
+       position: absolute; /* Ensure overlay covers slice */
+   }
+
+   .slice::after {
+       content: '';
+       position: absolute;
+       top: 0;
+       left: 0;
+       right: 0;
+       bottom: 0;
+       background: rgba(0, 0, 0, 0.3); /* Dark overlay for contrast */
+       z-index: 2; /* Above image, below text if any */
+   }
+
+   .slice:nth-child(even) {
+       background-color: #e74c3c;
+   }
+
+   /* Spin Button Styling */
+   #spin {
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%);
+       width: 100px; /* Make it a fixed size for circle */
+       height: 100px; /* Make it a fixed size for circle */
+       padding: 0; /* Remove padding to control size with width/height */
+       font-size: 20px;
+       border: none;
+       border-radius: 50%; /* Make it circular */
+       background: linear-gradient(145deg, #2ecc71, #27ae60);
+       color: white;
+       cursor: pointer;
+       z-index: 20;
+       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+       transition: all 0.3s ease;
+       font-weight: 700;
+       letter-spacing: 0.5px;
+       text-transform: uppercase;
+       display: flex; /* Use flex to center text vertically and horizontally */
+       justify-content: center;
+       align-items: center;
+       /* Touch-friendly for mobile */
+       touch-action: manipulation;
+       -webkit-tap-highlight-color: transparent;
+   }
+
+   #spin:hover {
+       background: linear-gradient(145deg, #27ae60, #2ecc71);
+       transform: translate(-50%, -50%) scale(1.08);
+       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+   }
+
+   #spin:active {
+       background: #239b56;
+       transform: translate(-50%, -50%) scale(0.95);
+       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+   }
+
+   /* Result Display Area */
+   #result {
+       margin-top: 30px;
+       padding: 20px;
+       background: #2e2e4a;
+       border-radius: 12px;
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+       max-width: 90%;
+       width: 350px;
+       margin-left: auto;
+       margin-right: auto;
+       border: 1px solid #4a4a6b;
+       opacity: 0; /* Hidden by default */
+       transform: scale(0.8); /* Smaller by default */
+       transition: opacity 0.5s ease-out, transform 0.5s ease-out; /* Animation */
+   }
+
+   #result.show {
+       opacity: 1;
+       transform: scale(1);
+   }
+
+   #result p {
+       margin: 8px 0;
+   }
+
+   #result strong {
+       color: #f39c12;
+       font-size: 1.2em;
+   }
+
+   #result em {
+       color: #b0b0b0;
+   }
+
+   #result img {
+       max-height: 150px;
+       margin-top: 15px;
+       border-radius: 10px;
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+       width: auto;
+       height: auto;
+       display: block;
+       margin-left: auto;
+       margin-right: auto;
+       border: 2px solid #5a5a7d;
+   }
+
+   #result .remove-from-result-btn {
+       margin-top: 15px;
+       padding: 10px 15px;
+       font-size: 16px;
+       border-radius: 8px;
+       background: linear-gradient(145deg, #e74c3c, #c0392b);
+       color: white;
+       border: none;
+       cursor: pointer;
+       transition: background 0.3s ease, transform 0.2s ease;
+       font-weight: 600;
+       letter-spacing: 0.2px;
+       text-transform: uppercase;
+       touch-action: manipulation;
+       -webkit-tap-highlight-color: transparent;
+   }
+
+   #result .remove-from-result-btn:hover {
+       background: linear-gradient(145deg, #c0392b, #e74c3c);
+       transform: translateY(-2px);
+   }
+
+
+   /* Toggle Edit Link */
+   #toggleEdit {
+       display: block;
+       margin-top: 30px;
+       color: #66bbff;
+       text-decoration: none;
+       cursor: pointer;
+       user-select: none;
+       font-size: 18px;
+       transition: color 0.3s ease, transform 0.2s ease;
+       font-weight: 600;
+       touch-action: manipulation;
+       -webkit-tap-highlight-color: transparent;
+   }
+
+   #toggleEdit:hover {
+       color: #99ddff;
+       transform: translateY(-2px);
+   }
+
+   /* Collapsible Edit Section */
+   .collapsible {
+       overflow: hidden;
+       max-height: 0;
+       transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+       padding-top: 0;
+       width: 100%;
+       max-width: 450px;
+       margin: 20px auto;
+       background: #2e2e4a;
+       border-radius: 12px;
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+       box-sizing: border-box;
+       border: 1px solid #4a4a6b;
+   }
+
+   .collapsible.expanded {
+       max-height: 1000px; /* Increased to accommodate 6 recommendations + autocomplete */
+       padding: 20px;
+   }
+
+   /* Form Elements */
+   select, input[type="text"], button {
+       font-family: 'Inter', sans-serif;
+       font-size: 16px;
+       margin: 8px 0;
+       padding: 10px 15px;
+       border-radius: 8px;
+       border: 1px solid #5a5a7d;
+       background-color: #3a3a5e;
+       color: #e0e0e0;
+       box-sizing: border-box;
+       width: 100%;
+       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+       touch-action: manipulation;
+       -webkit-tap-highlight-color: transparent;
+   }
+
+   input[type="text"]::placeholder {
+       color: #a0a0a0;
+   }
+
+   button[type="submit"], #removeMovieButton, .add-recommended-btn {
+       cursor: pointer;
+       background: linear-gradient(145deg, #3498db, #2980b9);
+       border: none;
+       transition: background 0.3s ease, transform 0.2s ease;
+       font-weight: 600;
+       letter-spacing: 0.2px;
+       text-transform: uppercase;
+   }
+
+   button[type="submit"]:hover, #removeMovieButton:hover, .add-recommended-btn:hover {
+       background: linear-gradient(145deg, #2980b9, #3498db);
+       transform: translateY(-2px);
+   }
+
+   #removeMovieButton {
+       background: linear-gradient(145deg, #e74c3c, #c0392b);
+   }
+
+   #removeMovieButton:hover {
+       background: linear-gradient(145deg, #c0392b, #e74c3c);
+   }
+
+   /* History Section */
+   #history {
+       list-style: none;
+       padding: 0;
+       max-width: 450px;
+       margin: 30px auto;
+       text-align: left;
+       background: #2e2e4a;
+       border-radius: 12px;
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+       border: 1px solid #4a4a6b;
+   }
+
+   #history li {
+       border-bottom: 1px solid #3a3a5e;
+       padding: 15px;
+       display: flex;
+       align-items: center;
+       flex-wrap: wrap;
+       gap: 10px;
+   }
+
+   #history li:last-child {
+       border-bottom: none;
+   }
+
+   #history li strong {
+       color: #f39c12;
+       font-size: 1.1em;
+       flex-basis: auto;
+       margin-right: auto;
+   }
+
+   #history li em {
+       color: #b0b0b0;
+       font-size: 0.9em;
+   }
+
+   #history li img {
+       max-height: 70px;
+       border-radius: 6px;
+       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+       margin-top: 0;
+       border: 1px solid #5a5a7d;
+   }
+
+   /* Confetti Container */
+   #confetti-container {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       pointer-events: none;
+       overflow: hidden;
+       z-index: 999;
+   }
+   .confetti-piece {
+       position: absolute;
+       width: 10px;
+       height: 10px;
+       background-color: var(--confetti-color);
+       opacity: 0;
+       animation: confetti-fall 3s forwards ease-in;
+   }
+
+   /* Toast Notification */
+   #toast-container {
+       position: fixed;
+       top: 20px;
+       left: 50%;
+       transform: translateX(-50%);
+       z-index: 1000;
+       display: flex;
+       flex-direction: column;
+       align-items: center;
+       pointer-events: none; /* Allow clicks through */
+   }
+
+   .toast {
+       background-color: rgba(50, 50, 50, 0.9);
+       color: white;
+       padding: 10px 20px;
+       border-radius: 5px;
+       margin-bottom: 10px;
+       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+       opacity: 0;
+       animation: fadeInOut 3s forwards;
+       pointer-events: auto; /* Re-enable clicks for the toast itself */
+   }
+
+   /* Loading Indicator */
+   .loading-spinner {
+       border: 4px solid rgba(255, 255, 255, 0.3);
+       border-top: 4px solid #f39c12;
+       border-radius: 50%;
+       width: 20px;
+       height: 20px;
+       animation: spin 1s linear infinite;
+       display: inline-block;
+       vertical-align: middle;
+       margin-left: 10px;
+   }
+
+   @keyframes spin {
+       0% { transform: rotate(0deg); }
+       100% { transform: rotate(360deg); }
+   }
+
+   /* Autocomplete Suggestions */
+   #autocompleteSuggestions {
+       background-color: #3a3a5e;
+       border: 1px solid #5a5a7d;
+       border-radius: 8px;
+       max-height: 200px;
+       overflow-y: auto;
+       position: relative; /* Changed from absolute to relative */
+       z-index: 100;
+       margin-top: -8px; /* Overlap with input border */
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+       text-align: left;
+   }
+
+   .suggestion-item {
+       padding: 10px 15px;
+       cursor: pointer;
+       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+       transition: background-color 0.2s ease;
+       display: flex;
+       align-items: center;
+       gap: 10px;
+       touch-action: manipulation;
+       -webkit-tap-highlight-color: transparent;
+   }
+
+   .suggestion-item:last-child {
+       border-bottom: none;
+   }
+
+   .suggestion-item:hover {
+       background-color: #4a4a6b;
+   }
+
+   .suggestion-item img {
+       width: 40px;
+       height: 60px;
+       object-fit: cover;
+       border-radius: 4px;
+       border: 1px solid #5a5a7d;
+   }
+
+   /* Recommended Movies Section */
+   #recommendedMoviesSection {
+       width: 100%;
+       max-width: 450px;
+       margin: 30px auto;
+       background: #2e2e4a;
+       border-radius: 12px;
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+       border: 1px solid #4a4a6b;
+       padding: 20px;
+       box-sizing: border-box;
+   }
+
+   #recommendedMoviesList {
+       display: grid;
+       grid-template-columns: 1fr; /* Single column for mobile */
+       gap: 15px;
+       margin-top: 15px;
+   }
+
+   .recommended-movie-card {
+       background-color: #3a3a5e;
+       border-radius: 8px;
+       padding: 10px;
+       display: flex;
+       align-items: center;
+       gap: 15px;
+       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+       text-align: left;
+   }
+
+   .recommended-movie-card img {
+       width: 60px;
+       height: 90px;
+       object-fit: cover;
+       border-radius: 6px;
+       border: 1px solid #5a5a7d;
+       flex-shrink: 0;
+   }
+
+   .recommended-movie-info {
+       flex-grow: 1;
+   }
+
+   .recommended-movie-info strong {
+       display: block;
+       font-size: 1.1em;
+       color: #f39c12;
+       margin-bottom: 5px;
+   }
+
+   .recommended-movie-info span {
+       font-size: 0.9em;
+       color: #b0b0b0;
+   }
+
+   .add-recommended-btn {
+       padding: 8px 12px;
+       font-size: 0.9em;
+       border-radius: 6px;
+       white-space: nowrap; /* Prevent text wrapping */
+       min-width: fit-content;
+   }
+
+   .bad-movie-recommendation {
+       border: 2px dashed #e74c3c; /* Distinct border for bad movie */
+       background-color: #4a2e2e; /* Slightly different background */
+       margin-top: 20px; /* Space it out */
+   }
+
+   /* Responsive adjustments */
+   @media (max-width: 600px) {
+       body {
+           padding: 15px;
+           padding-top: max(15px, env(safe-area-inset-top));
+           padding-bottom: max(15px, env(safe-area-inset-bottom));
+           padding-left: max(15px, env(safe-area-inset-left));
+           padding-right: max(15px, env(safe-area-inset-right));
+       }
+       h1 {
+           font-size: 1.8em;
+           padding: 12px 15px;
+           margin: calc(-1 * max(15px, env(safe-area-inset-top))) calc(-1 * max(15px, env(safe-area-inset-right))) 15px calc(-1 * max(15px, env(safe-area-inset-left))); /* Adjust margin for smaller screens */
+           width: calc(100% + max(30px, env(safe-area-inset-left) + env(safe-area-inset-right)));
+       }
+       h2 {
+           font-size: 1.4em;
+       }
+       #wheel3d {
+           width: 280px;
+           height: 280px;
+       }
+       #spin {
+           width: 90px;
+           height: 90px;
+           font-size: 18px;
+       }
+       #result {
+           width: 95%;
+           padding: 15px;
+       }
+       #result img {
+           max-height: 120px;
+       }
+       .collapsible, #history, #recommendedMoviesSection {
+           max-width: 95%;
+           padding: 15px;
+       }
+       select, input[type="text"], button {
+           font-size: 15px;
+           padding: 10px;
+       }
+       #history li {
+           padding: 12px;
+       }
+       #history li img {
+           max-height: 55px;
+       }
+       .recommended-movie-card {
+           flex-direction: column; /* Stack info and button on small screens */
+           align-items: flex-start;
+           text-align: center;
+       }
+       .recommended-movie-card img {
+           margin-bottom: 10px;
+       }
+       .add-recommended-btn {
+           width: 100%;
+           margin-top: 10px;
+       }
+   }
+
+   @media (max-width: 400px) {
+       #wheel3d {
+           width: 240px;
+           height: 240px;
+       }
+       #spin {
+           width: 80px;
+           height: 80px;
+           font-size: 16px;
+       }
+       #result img {
+           max-height: 90px;
+       }
+       #history li img {
+           max-height: 45px;
+       }
+   }
+
+   /* iOS specific styles */
+   @supports (-webkit-touch-callout: none) {
+       body {
+           -webkit-user-select: none;
+           -webkit-touch-callout: none;
+       }
+       
+       input, textarea, select {
+           -webkit-user-select: text;
+       }
+   }
+</style>
+</head>
+<body>
+   <!-- PWA Install Banner -->
+   <div id="pwa-install-banner">
+       <span>📱 Install Cinefilos for the best experience!</span>
+       <button id="install-btn">Install</button>
+       <button id="dismiss-btn">Dismiss</button>
+   </div>
+   <div id="ios-install-banner" style="display:none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(90deg, #667eea, #764ba2); color: white; padding: 16px 24px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 2000; text-align: center;">
+       <span>📱 Add Cinefilos to your Home Screen for the best experience!</span>
+       <button id="ios-install-btn" style="margin-left: 12px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 14px;">How?</button>
+   </div>
+   <div id="ios-install-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(30,30,50,0.85); z-index: 3000; align-items: center; justify-content: center;">
+       <div style="background: #2e2e4a; color: #fff; padding: 28px 20px 20px 20px; border-radius: 16px; max-width: 90vw; width: 350px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); text-align: left; position: relative;">
+           <button id="close-ios-modal" style="position: absolute; top: 10px; right: 14px; background: none; border: none; color: #fff; font-size: 1.5em; cursor: pointer;">&times;</button>
+           <h2 style="margin-top:0;">Add to Home Screen (iPhone/iPad)</h2>
+           <ol style="margin: 0 0 0 1.2em; padding: 0;">
+               <li>Tap <span style="font-size:1.2em;">Share <span style="font-size:1.2em;">&#x1f5d2;</span></span> at the bottom of Safari.</li>
+               <li>Scroll down and tap <b>Add to Home Screen</b> <span style="font-size:1.2em;">&#x2795;</span>.</li>
+               <li>Tap <b>Add</b> in the top right corner.</li>
+           </ol>
+           <p style="margin-top: 1em; color: #b0b0b0; font-size: 0.95em;">Enjoy Cinefilos as a full app experience!</p>
+       </div>
+   </div>
+
+   <h1>CINEFILOS</h1>
+
+   <div id="needle"></div>
+   <div id="wheel3d">
+       <!-- Slices will be built here by JS -->
+       <button id="spin">SPIN</button>
+   </div>
+
+   <div id="result"></div>
+   <div id="confetti-container"></div> <!-- Confetti container -->
+   <div id="toast-container"></div> <!-- Toast notification container -->
+
+   <h2>📜 Spin History</h2>
+   <ul id="history"></ul>
+
+   <a href="#" id="toggleEdit">➕ Show Add/Remove Movies & Recommendations</a>
+   <div id="editSection" class="collapsible">
+       <h2>Add a Movie</h2>
+       <form id="addMovieForm">
+           <input type="text" id="movieTitle" placeholder="Movie title" required />
+           <div id="autocompleteSuggestions" class="autocomplete-suggestions"></div>
+           <button type="submit">Add Movie <span id="addMovieSpinner" class="loading-spinner" style="display:none;"></span></button>
+       </form>
+       <h2>Remove a Movie</h2>
+       <select id="removeMovieSelect"></select>
+       <button id="removeMovieButton">Remove Selected Movie</button>
+   </div>
+
+   <div id="recommendedMoviesSection">
+       <h2>✨ Recommended Movies</h2>
+       <div id="recommendedMoviesList">
+           <!-- Recommended movies will be loaded here by JS -->
+           <p id="loadingRecommendations" style="text-align: center; color: #b0b0b0;">Loading recommendations...</p>
+       </div>
+   </div>
+
+   <script>
+       // PWA Installation Logic
+       let deferredPrompt;
+       const installBanner = document.getElementById('pwa-install-banner');
+       const installBtn = document.getElementById('install-btn');
+       const dismissBtn = document.getElementById('dismiss-btn');
+
+       // Check if app is already installed
+       function isAppInstalled() {
+           return window.matchMedia('(display-mode: standalone)').matches || 
+                  window.navigator.standalone === true;
+       }
+
+       // Show install banner if not installed and prompt is available
+       window.addEventListener('beforeinstallprompt', (e) => {
+           e.preventDefault();
+           deferredPrompt = e;
+           
+           if (!isAppInstalled() && !localStorage.getItem('pwa-dismissed')) {
+               installBanner.classList.add('show');
+           }
+       });
+
+       // Handle install button click
+       installBtn.addEventListener('click', async () => {
+           if (deferredPrompt) {
+               deferredPrompt.prompt();
+               const { outcome } = await deferredPrompt.userChoice;
+               console.log(`User response to the install prompt: ${outcome}`);
+               deferredPrompt = null;
+               installBanner.classList.remove('show');
+           }
+       });
+
+       // Handle dismiss button click
+       dismissBtn.addEventListener('click', () => {
+           installBanner.classList.remove('show');
+           localStorage.setItem('pwa-dismissed', 'true');
+       });
+
+       // Hide banner if app is installed
+       window.addEventListener('appinstalled', () => {
+           installBanner.classList.remove('show');
+           console.log('PWA was installed');
+       });
+
+       // Default movies - these will be populated with poster data on load
+       const defaultEntries = [
+           { title: "Atroz" },
+           { title: "Death Race 2000" },
+           { title: "Up in Smoke" },
+           { title: "Cementerio del Terror" },
+           { title: "Cujo" },
+           { title: "Detroit Rock City" },
+           { title: "Good Burger" },
+           { title: "The Cable Guy" },
+           { title: "Hard Target" },
+           { title: "The Room" }
+       ];
+
+       // Expanded list of popular movies for recommendations.
+       // These will be filtered by director of the spun movie, or similar style.
+       const popularMovieTitlesForRecommendations = [
+           "The Shawshank Redemption", "The Godfather", "The Dark Knight", "Pulp Fiction",
+           "Forrest Gump", "Inception", "The Matrix", "Interstellar", "Parasite", "Spirited Away",
+           "Gladiator", "Blade Runner 2049", "Whiplash", "La La Land", "Joker", "Dune",
+           "Fight Club", "Goodfellas", "Seven", "Spiderman: Into the Spider-Verse", "Coco",
+           "The Lion King", "Back to the Future", "E.T. the Extra-Terrestrial", "Alien",
+           "Terminator 2: Judgment Day", "The Grand Budapest Hotel", "Amelie",
+           "Memento", "The Prestige", "Tenet", // Christopher Nolan
+           "Goodfellas", "The Departed", "Taxi Driver", "Raging Bull", // Martin Scorsese
+           "Kill Bill: Vol. 1", "Django Unchained", "Inglourious Basterds", "Jackie Brown", // Quentin Tarantino
+           "Spirited Away", "Princess Mononoke", "My Neighbor Totoro", "Howl's Moving Castle", // Hayao Miyazaki
+           "Sin City", "From Dusk Till Dawn", "Desperado", "El Mariachi", // Robert Rodriguez
+           "Reservoir Dogs", "Death Proof", // More Tarantino
+           "Casino", "The Irishman", // More Scorsese
+           "2001: A Space Odyssey", "A Clockwork Orange", "The Shining", // Stanley Kubrick
+           "Apocalypse Now", "The Godfather Part II", // Francis Ford Coppola
+           "Vertigo", "Psycho", "Rear Window" // Alfred Hitchcock
+       ];
+
+       // New list for low-rated movie recommendations
+       const lowRatedMovieTitles = [
+           "Plan 9 from Outer Space",
+           "Birdemic: Shock and Terror",
+           "Manos: The Hands of Fate",
+           "The Room",
+           "Troll 2",
+           "Gigli",
+           "Battlefield Earth",
+           "Cats (2019)",
+           "Jack and Jill",
+           "Movie 43"
+       ];
+
+       // Hardcoded map for similar directors (case-insensitive keys)
+       const similarDirectorsMap = {
+           "quentin tarantino": ["robert rodriguez"],
+           "robert rodriguez": ["quentin tarantino"],
+           "christopher nolan": [], // Add others if desired
+           "martin scorsese": [],
+           "hayao miyazaki": [],
+           "stanley kubrick": [],
+           "francis ford coppola": [],
+           "alfred hitchcock": []
+       };
+
+       let entries = []; // This array will hold the full movie data including posters
+       let lastSpunMovieDetailedInfo = null; // Global to store info of last spun movie for recommendations
+
+       // DOM Elements
+       const wheel = document.getElementById("wheel3d");
+       const spinBtn = document.getElementById("spin");
+       const resultDiv = document.getElementById("result");
+       const removeSelect = document.getElementById("removeMovieSelect");
+       const addForm = document.getElementById("addMovieForm");
+       const movieTitleInput = document.getElementById("movieTitle"); // Renamed for clarity
+       const historyList = document.getElementById("history");
+       const toggleEditLink = document.getElementById("toggleEdit");
+       const editSection = document.getElementById("editSection");
+       const confettiContainer = document.getElementById("confetti-container");
+       const toastContainer = document.getElementById("toast-container");
+       const addMovieSpinner = document.getElementById("addMovieSpinner");
+       const autocompleteSuggestionsDiv = document.getElementById("autocompleteSuggestions");
+       const recommendedMoviesListDiv = document.getElementById("recommendedMoviesList");
+       const loadingRecommendationsText = document.getElementById("loadingRecommendations");
+
+
+       let currentRotation = 0;
+       let spinning = false;
+       let audioContextResumed = false; // Flag to track audio context state
+       let autocompleteTimeout = null; // For debouncing autocomplete
+
+       // Tone.js setup for sounds
+       const spinSound = new Tone.Synth({
+           oscillator: { type: "sawtooth" },
+           envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.5 },
+           volume: -10
+       }).toDestination();
+
+       const winSound = new Tone.Synth({
+           oscillator: { type: "sine" },
+           envelope: { attack: 0.02, decay: 0.2, sustain: 0.1, release: 0.8 },
+           volume: -8
+       }).toDestination();
+
+       /**
+        * Resumes the Tone.js audio context on the first user interaction.
+        * This is necessary due to browser autoplay policies.
+        */
+       function resumeAudioContext() {
+           if (!audioContextResumed) {
+               Tone.start().then(() => {
+                   console.log("AudioContext resumed!");
+                   audioContextResumed = true;
+               }).catch(e => console.error("Error resuming AudioContext:", e));
+           }
+       }
+
+       // Attach resumeAudioContext to relevant user interaction events
+       document.addEventListener('click', resumeAudioContext, { once: true });
+       document.addEventListener('touchstart', resumeAudioContext, { once: true });
+
+       /**
+        * Fetches movie data from the OMDb API.
+        * @param {string} title - The title of the movie to search for.
+        * @returns {Promise<Object>} A promise that resolves with movie data (title, runtime, poster, director)
+        * or a fallback object if not found/error.
+        */
+       async function fetchMovieData(title) {
+           const apiKey = "225d3569"; // OMDb API Key
+           const url = `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(title)}`;
+           try {
+               const res = await fetch(url);
+               const data = await res.json();
+
+               if (data.Response === "True") {
+                   return {
+                       title: data.Title,
+                       runtime: data.Runtime && data.Runtime !== "N/A" ? data.Runtime : "–",
+                       poster: data.Poster && data.Poster !== "N/A" ? data.Poster : null,
+                       Director: data.Director && data.Director !== "N/A" ? data.Director : null // Added Director
+                   };
+               } else {
+                   console.warn(`Movie not found or error for "${title}": ${data.Error}`);
+                   return { title: title, runtime: "–", poster: null, Director: null }; // Return with no poster/director if not found
+               }
+           } catch (err) {
+               console.error(`Error fetching movie data for "${title}":`, err);
+               return { title: title, runtime: "–", poster: null, Director: null }; // Return with no poster/director on network error
+           }
+       }
+
+       /**
+        * Searches for movies using the OMDb API (for autocomplete).
+        * @param {string} query - The search query.
+        * @returns {Promise<Array>} A promise that resolves with an array of movie search results.
+        */
+       async function searchMovies(query) {
+           const apiKey = "225d3569"; // OMDb API Key
+           const url = `https://www.omdbapi.com/?apikey=${apiKey}&s=${encodeURIComponent(query)}`;
+           try {
+               const res = await fetch(url);
+               const data = await res.json();
+               if (data.Response === "True" && data.Search) {
+                   return data.Search.filter(movie => movie.Type === "movie"); // Only return movies
+               }
+               return [];
+           } catch (err) {
+               console.error(`Error searching movies for "${query}":`, err);
+               return [];
+           }
+       }
+
+       /**
+        * Dynamically builds the slices of the 3D wheel based on the 'entries' array.
+        */
+       function buildWheel() {
+           // Remove all existing slices, keeping only the spin button
+           Array.from(wheel.children).forEach(child => {
+               if (child.id !== "spin") {
+                   wheel.removeChild(child);
+               }
+           });
+
+           if (entries.length === 0) {
+               // If no entries, display a message or a blank wheel
+               const noMoviesSlice = document.createElement("div");
+               noMoviesSlice.className = "slice";
+               noMoviesSlice.style.transform = `rotate(0deg) skewY(0deg)`; // Full circle
+               noMoviesSlice.style.backgroundColor = '#555';
+               noMoviesSlice.style.backgroundImage = `url('https://placehold.co/150x220/555555/ffffff?text=No+Movies+Yet!')`;
+               wheel.insertBefore(noMoviesSlice, spinBtn);
+               return;
+           }
+
+           const sliceDeg = 360 / entries.length;
+
+           entries.forEach((entry, i) => {
+               const slice = document.createElement("div");
+               slice.className = "slice";
+               slice.style.transform = `
+                   rotate(${i * sliceDeg}deg)
+                   skewY(${90 - sliceDeg}deg)
+               `;
+               // Set background image for the slice
+               if (entry.poster) {
+                   slice.style.backgroundImage = `url('${entry.poster}')`;
+               } else {
+                   // Fallback to a solid color and placeholder image if no poster
+                   const fallbackColor = (i % 2 === 0) ? '#3498db' : '#e74c3c';
+                   slice.style.backgroundColor = fallbackColor;
+                   slice.style.backgroundImage = `url('https://placehold.co/150x220/${fallbackColor.substring(1)}/ffffff?text=No+Poster')`;
+               }
+               wheel.insertBefore(slice, spinBtn); // Insert slices before the spin button
+           });
+       }
+
+       /**
+        * Handles the wheel spinning logic, selects a winner, and displays the result.
+        */
+       function spinWheel() {
+           if (spinning) return; // Prevent multiple simultaneous spins
+           if (entries.length === 0) {
+               showToast("Please add some movies first!", "error");
+               return;
+           }
+
+           spinning = true;
+           spinBtn.disabled = true; // Disable button during spin
+           spinSound.triggerAttack("C4", Tone.now(), 0.5); // Start spin sound
+
+           const sliceDeg = 360 / entries.length;
+           const winnerIndex = Math.floor(Math.random() * entries.length);
+           const rotationOffset = 360 * 5; // Ensure at least 5 full spins for visual effect
+           const targetAngleForWinner = winnerIndex * sliceDeg;
+           // Calculate final rotation to center the winning slice under the needle
+           const finalRotation = rotationOffset - targetAngleForWinner - (sliceDeg / 2);
+
+           // Add a small random offset to make each spin slightly different
+           const randomOffset = Math.random() * (sliceDeg * 0.8) - (sliceDeg * 0.4); // +/- 40% of a slice
+           currentRotation = finalRotation + randomOffset;
+
+           // Apply rotation with CSS transition
+           wheel.style.transition = 'transform 4s ease-out';
+           wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+           // After the spin animation completes
+           setTimeout(async () => { // Made setTimeout async
+               spinSound.triggerRelease(Tone.now()); // Stop spin sound
+               winSound.triggerAttackRelease("C5", "8n", Tone.now()); // Play win sound
+
+               const winner = entries[winnerIndex];
+               // Fetch full details for the winner to get director for recommendations
+               const winnerFullDetails = await fetchMovieData(winner.title);
+               lastSpunMovieDetailedInfo = winnerFullDetails; // Store for recommendations
+
+               let html = `<p>🎉 You got: <strong>${winnerFullDetails.title}</strong></p>`;
+               if (winnerFullDetails.runtime && winnerFullDetails.runtime !== "–") html += `<p><em>${winnerFullDetails.runtime}</em></p>`;
+               
+               // Use a fallback image if no poster is available
+               const posterSrc = winnerFullDetails.poster || `https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster`;
+               html += `<img src="${posterSrc}" alt="${winnerFullDetails.title} poster" onerror="this.onerror=null;this.src='https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster';"/>`;
+               
+               // Add the "Remove from List" button
+               html += `<button class="remove-from-result-btn" data-movie-title="${winnerFullDetails.title}">Remove from List</button>`;
+
+               resultDiv.innerHTML = html;
+               resultDiv.classList.add('show'); // Show result with animation
+
+               // Add event listener for the new remove button
+               resultDiv.querySelector('.remove-from-result-btn').addEventListener('click', (e) => {
+                   const titleToRemove = e.target.dataset.movieTitle;
+                   removeMovieByTitle(titleToRemove);
+               });
+
+               addToHistory(winnerFullDetails.title, winnerFullDetails.runtime, winnerFullDetails.poster);
+
+               spinning = false;
+               spinBtn.disabled = false; // Re-enable button
+
+               // --- FIX: Reset wheel transform for smoother subsequent spins ---
+               // Calculate the effective rotation angle (0-359 degrees)
+               const effectiveRotation = currentRotation % 360;
+               // Temporarily disable transition
+               wheel.style.transition = 'none';
+               // Apply the effective rotation
+               wheel.style.transform = `rotate(${effectiveRotation}deg)`;
+               // Re-enable transition for the next spin by requesting animation frame
+               requestAnimationFrame(() => {
+                   wheel.style.transition = 'transform 4s ease-out';
+               });
+               // --- END FIX ---
+
+               triggerConfetti(); // Trigger confetti effect
+               loadRecommendedMovies(); // Reload recommendations after a spin
+           }, 4000); // Match this timeout to the CSS transition duration
+       }
+
+       /**
+        * Removes a movie from the entries list by its title.
+        * @param {string} titleToRemove - The title of the movie to remove.
+        */
+       function removeMovieByTitle(titleToRemove) {
+           const initialLength = entries.length;
+           entries = entries.filter(entry => entry.title.toLowerCase() !== titleToRemove.toLowerCase());
+           if (entries.length < initialLength) {
+               buildWheel();
+               updateRemoveMenu();
+               localStorage.setItem("movieEntries", JSON.stringify(entries));
+               showToast(`${titleToRemove} removed from your list.`, "info");
+               loadRecommendedMovies(); // Reload recommendations after removing
+               resultDiv.classList.remove('show'); // Hide the result div after removal
+               resultDiv.innerHTML = ''; // Clear content
+           } else {
+               showToast(`${titleToRemove} was not found in your list.`, "error");
+           }
+       }
+
+
+       /**
+        * Adds a movie to the spin history and stores it in local storage.
+        * Limits history to 20 entries.
+        * @param {string} title - The title of the movie.
+        * @param {string} runtime - The runtime of the movie.
+        * @param {string|null} poster - The URL of the movie poster, or null.
+        */
+       function addToHistory(title, runtime, poster) {
+           const li = document.createElement("li");
+           // Use a fallback image for history entries too
+           const historyPosterSrc = poster || `https://placehold.co/70x100/3a3a5e/ffffff?text=No+Poster`;
+           li.innerHTML = `
+               <strong>${title}</strong> - <em>${runtime}</em>
+               <img src="${historyPosterSrc}" alt="poster" onerror="this.onerror=null;this.src='https://placehold.co/70x100/3a3a5e/ffffff?text=No+Poster';">
+           `;
+           historyList.prepend(li); // Add to the beginning of the list
+
+           const stored = JSON.parse(localStorage.getItem("spinHistory") || "[]");
+           stored.unshift({ title, runtime, poster }); // Add new entry to the start
+           if (stored.length > 20) { // Keep history limited to 20 items
+               stored.pop();
+           }
+           localStorage.setItem("spinHistory", JSON.stringify(stored));
+       }
+
+       /**
+        * Loads spin history from local storage and displays it.
+        */
+       function loadHistory() {
+           const stored = JSON.parse(localStorage.getItem("spinHistory") || "[]");
+           historyList.innerHTML = ""; // Clear existing history
+           stored.forEach(entry => {
+               const li = document.createElement("li");
+               const historyPosterSrc = entry.poster || `https://placehold.co/70x100/3a3a5e/ffffff?text=No+Poster`;
+               li.innerHTML = `
+                   <strong>${entry.title}</strong> - <em>${entry.runtime}</em>
+                   <img src="${historyPosterSrc}" alt="poster" onerror="this.onerror=null;this.src='https://placehold.co/70x100/3a3a5e/ffffff?text=No+Poster';">
+               `;
+               historyList.appendChild(li); // Use appendChild for initial load to maintain chronological order
+           });
+       }
+
+       /**
+        * Updates the dropdown menu for removing movies.
+        */
+       function updateRemoveMenu() {
+           removeSelect.innerHTML = ""; // Clear existing options
+           if (entries.length === 0) {
+               const opt = document.createElement("option");
+               opt.textContent = "No movies to remove";
+               opt.disabled = true;
+               opt.selected = true; // Select this option by default
+               removeSelect.appendChild(opt);
+               document.getElementById("removeMovieButton").disabled = true; // Disable remove button
+               return;
+           }
+           document.getElementById("removeMovieButton").disabled = false; // Enable remove button
+           entries.forEach((movie, i) => {
+               const opt = document.createElement("option");
+               opt.value = i;
+               opt.textContent = movie.title;
+               removeSelect.appendChild(opt);
+           });
+       }
+
+       /**
+        * Displays a temporary toast notification.
+        * @param {string} message - The message to display.
+        * @param {string} type - Type of message ('success', 'error', 'info').
+        */
+       function showToast(message, type = 'info') {
+           const toast = document.createElement('div');
+           toast.className = `toast toast-${type}`;
+           toast.textContent = message;
+           toastContainer.appendChild(toast);
+
+           // Remove toast after animation
+           setTimeout(() => {
+               toast.remove();
+           }, 3000); // Matches fadeInOut animation duration
+       }
+
+       /**
+        * Triggers a confetti animation.
+        */
+       function triggerConfetti() {
+           const colors = ['#f39c12', '#2ecc71', '#3498db', '#e74c3c', '#9b59b6'];
+           for (let i = 0; i < 50; i++) { // Generate 50 confetti pieces
+               const confettiPiece = document.createElement('div');
+               confettiPiece.className = 'confetti-piece';
+               confettiPiece.style.left = `${Math.random() * 100}vw`;
+               confettiPiece.style.animationDelay = `${Math.random() * 0.5}s`;
+               confettiPiece.style.animationDuration = `${2 + Math.random() * 1}s`;
+               confettiPiece.style.setProperty('--confetti-color', colors[Math.floor(Math.random() * colors.length)]);
+               confettiContainer.appendChild(confettiPiece);
+           }
+           // Clean up confetti after animation
+           setTimeout(() => {
+               confettiContainer.innerHTML = ''; // Clear all confetti pieces
+           }, 3500);
+       }
+
+       /**
+        * Handles autocomplete suggestions for movie titles.
+        */
+       async function handleAutocomplete() {
+           clearTimeout(autocompleteTimeout);
+           const query = movieTitleInput.value.trim();
+           autocompleteSuggestionsDiv.innerHTML = ''; // Clear previous suggestions
+
+           if (query.length < 3) { // Only search if query is at least 3 characters
+               return;
+           }
+
+           autocompleteTimeout = setTimeout(async () => {
+               const results = await searchMovies(query);
+               if (results.length > 0) {
+                   results.slice(0, 5).forEach(movie => { // Show top 5 results
+                       const suggestionItem = document.createElement('div');
+                       suggestionItem.className = 'suggestion-item';
+                       const posterSrc = movie.Poster && movie.Poster !== "N/A" ? movie.Poster : `https://placehold.co/40x60/3a3a5e/ffffff?text=No+Poster`;
+                       suggestionItem.innerHTML = `
+                           <img src="${posterSrc}" alt="${movie.Title} poster" onerror="this.onerror=null;this.src='https://placehold.co/40x60/3a3a5e/ffffff?text=No+Poster';">
+                           <span>${movie.Title} (${movie.Year})</span>
+                       `;
+                       suggestionItem.addEventListener('click', () => {
+                           movieTitleInput.value = movie.Title;
+                           autocompleteSuggestionsDiv.innerHTML = ''; // Clear suggestions after selection
+                           // Optionally trigger add movie here, or let user click add button
+                       });
+                       autocompleteSuggestionsDiv.appendChild(suggestionItem);
+                   });
+               } else {
+                   const noResults = document.createElement('div');
+                   noResults.className = 'suggestion-item';
+                   noResults.textContent = 'No results found.';
+                   autocompleteSuggestionsDiv.appendChild(noResults);
+               }
+           }, 300); // Debounce time
+       }
+
+       /**
+        * Loads and displays recommended movies based on last spun movie's director or general popular movies.
+        * Includes a 6th recommendation for a random low-rated movie.
+        */
+       async function loadRecommendedMovies() {
+           loadingRecommendationsText.style.display = 'block';
+           recommendedMoviesListDiv.innerHTML = '';
+
+           const recommendations = [];
+           const processedTitles = new Set(entries.map(e => e.title.toLowerCase())); // Titles already on wheel
+           const addedToRecommendations = new Set(); // Titles already added to current recommendations
+
+           let targetDirectors = [];
+           if (lastSpunMovieDetailedInfo && lastSpunMovieDetailedInfo.Director && lastSpunMovieDetailedInfo.Director !== "N/A") {
+               const spunDirector = lastSpunMovieDetailedInfo.Director.toLowerCase();
+               targetDirectors.push(spunDirector);
+               // Add similar directors from the map
+               if (similarDirectorsMap[spunDirector]) {
+                   targetDirectors = targetDirectors.concat(similarDirectorsMap[spunDirector]);
+               }
+               // Remove duplicates from targetDirectors
+               targetDirectors = [...new Set(targetDirectors)];
+               console.log("Recommending based on directors:", targetDirectors.join(', '));
+           } else {
+               console.log("No specific director from last spun movie, showing general popular movies.");
+           }
+
+           // Attempt to find movies by target directors first (up to 5)
+           for (const director of targetDirectors) {
+               if (recommendations.length >= 5) break; // Limit to 5 main recommendations
+
+               for (const title of popularMovieTitlesForRecommendations) {
+                   if (recommendations.length >= 5) break; // Limit to 5 main recommendations
+                   if (processedTitles.has(title.toLowerCase()) || addedToRecommendations.has(title.toLowerCase())) {
+                       continue; // Skip if already on wheel or already considered for recommendations
+                   }
+
+                   const movieFullDetails = await fetchMovieData(title);
+                   if (movieFullDetails.title && movieFullDetails.Director && movieFullDetails.Director.toLowerCase() === director) {
+                       recommendations.push(movieFullDetails);
+                       addedToRecommendations.add(movieFullDetails.title.toLowerCase());
+                   }
+               }
+           }
+
+           // Fill remaining slots with general popular movies if needed (up to 5 total)
+           if (recommendations.length < 5) {
+               for (const title of popularMovieTitlesForRecommendations) {
+                   if (recommendations.length >= 5) break; // Limit to 5 main recommendations
+                   if (processedTitles.has(title.toLowerCase()) || addedToRecommendations.has(title.toLowerCase())) {
+                       continue; // Skip if already on wheel or already recommended
+                   }
+                   const movieFullDetails = await fetchMovieData(title);
+                   if (movieFullDetails.title) {
+                       recommendations.push(movieFullDetails);
+                       addedToRecommendations.add(movieFullDetails.title.toLowerCase());
+                   }
+               }
+           }
+
+           loadingRecommendationsText.style.display = 'none';
+
+           if (recommendations.length > 0) {
+               recommendedMoviesListDiv.innerHTML = ''; // Clear "Loading..." text
+               recommendations.forEach(movie => {
+                   const card = document.createElement('div');
+                   card.className = 'recommended-movie-card';
+                   const posterSrc = movie.poster || `https://placehold.co/60x90/3a3a5e/ffffff?text=No+Poster`;
+                   card.innerHTML = `
+                       <img src="${posterSrc}" alt="${movie.title} poster" onerror="this.onerror=null;this.src='https://placehold.co/60x90/3a3a5e/ffffff?text=No+Poster';">
+                       <div class="recommended-movie-info">
+                           <strong>${movie.title}</strong>
+                           <span>${movie.runtime}</span>
+                       </div>
+                       <button class="add-recommended-btn" data-title="${movie.title}">Add to Wheel</button>
+                   `;
+                   recommendedMoviesListDiv.appendChild(card);
+               });
+           } else {
+               let msg = "No recommendations found.";
+               if (targetDirectors.length > 0) {
+                   msg = `No recommendations by director(s) "${targetDirectors.join(', ')}" found in our curated list. Showing general popular movies.`;
+               } else {
+                   msg = "No general popular movies could be recommended right now. Try adding movies to your wheel and spinning!";
+               }
+               recommendedMoviesListDiv.innerHTML = `<p style="text-align: center; color: #b0b0b0;">${msg}</p>`;
+           }
+
+           // --- Add the 6th "bad movie" recommendation ---
+           if (lowRatedMovieTitles.length > 0) {
+               const randomBadMovieTitle = lowRatedMovieTitles[Math.floor(Math.random() * lowRatedMovieTitles.length)];
+               const badMovieData = await fetchMovieData(randomBadMovieTitle);
+
+               if (badMovieData.title && !processedTitles.has(badMovieData.title.toLowerCase())) { // Ensure it's not already on the wheel
+                   const badMovieCard = document.createElement('div');
+                   badMovieCard.className = 'recommended-movie-card bad-movie-recommendation'; // Add distinct class
+                   const posterSrc = badMovieData.poster || `https://placehold.co/60x90/e74c3c/ffffff?text=Bad+Movie`;
+                   badMovieCard.innerHTML = `
+                       <img src="${posterSrc}" alt="${badMovieData.title} poster" onerror="this.onerror=null;this.src='https://placehold.co/60x90/e74c3c/ffffff?text=Bad+Movie';">
+                       <div class="recommended-movie-info">
+                           <strong>${badMovieData.title}</strong>
+                           <span>${badMovieData.runtime}</span>
+                           <p style="font-size: 0.8em; color: #ffcc00; margin-top: 5px;">(For a laugh!)</p>
+                       </div>
+                       <button class="add-recommended-btn" data-title="${badMovieData.title}">Add to Wheel</button>
+                   `;
+                   recommendedMoviesListDiv.appendChild(badMovieCard);
+                   addedToRecommendations.add(badMovieData.title.toLowerCase()); // Prevent duplicates in this session
+               }
+           }
+           // --- End 6th recommendation ---
+
+           // Re-add event listeners for all "Add to Wheel" buttons (including the new bad movie one)
+           recommendedMoviesListDiv.querySelectorAll('.add-recommended-btn').forEach(button => {
+               button.addEventListener('click', async (e) => {
+                   const titleToAdd = e.target.dataset.title;
+                   const movieData = await fetchMovieData(titleToAdd); // Fetch data to ensure consistency
+                   if (movieData.title === titleToAdd && !entries.some(entry => entry.title.toLowerCase() === titleToAdd.toLowerCase())) {
+                       entries.push(movieData);
+                       buildWheel();
+                       updateRemoveMenu();
+                       localStorage.setItem("movieEntries", JSON.stringify(entries));
+                       showToast(`${movieData.title} added to your wheel!`, "success");
+                       loadRecommendedMovies(); // Reload recommendations to remove added movie
+                   } else if (entries.some(entry => entry.title.toLowerCase() === titleToAdd.toLowerCase())) {
+                       showToast(`${titleToAdd} is already on your wheel.`, "info");
+                   } else {
+                       showToast(`Could not add "${titleToAdd}".`, "error");
+                   }
+               });
+           });
+       }
+
+
+       // --- Event Listeners ---
+       spinBtn.addEventListener("click", spinWheel);
+
+       addForm.addEventListener("submit", async (e) => {
+           e.preventDefault();
+           const title = movieTitleInput.value.trim();
+           if (title) {
+               addMovieSpinner.style.display = 'inline-block'; // Show spinner
+               spinBtn.disabled = true; // Disable spin button during fetch
+               autocompleteSuggestionsDiv.innerHTML = ''; // Clear suggestions
+               try {
+                   // Check if movie is already in the list
+                   const isOnWheel = entries.some(entry => entry.title.toLowerCase() === title.toLowerCase());
+                   if (isOnWheel) {
+                       showToast(`${title} is already on your wheel.`, "info");
+                       return;
+                   }
+
+                   const movieData = await fetchMovieData(title);
+                   if (movieData.title === title) { // Check if the title matches (i.e., not a generic fallback)
+                       entries.push(movieData);
+                       showToast(`${movieData.title} added!`, "success");
+                   } else {
+                       showToast(`Could not find full data for "${title}". Added with limited info.`, "info");
+                       entries.push({ title: title, runtime: "–", poster: null, Director: null }); // Add even if API fails
+                   }
+                   buildWheel();
+                   updateRemoveMenu();
+                   movieTitleInput.value = "";
+                   localStorage.setItem("movieEntries", JSON.stringify(entries));
+                   loadRecommendedMovies(); // Reload recommendations after adding/removing
+               } catch (error) {
+                   console.error("Error adding movie:", error);
+                   showToast("Error adding movie. Please try again.", "error");
+               } finally {
+                   addMovieSpinner.style.display = 'none'; // Hide spinner
+                   spinBtn.disabled = false; // Re-enable spin button
+               }
+           } else {
+               showToast("Please enter a movie title.", "error");
+           }
+       });
+
+       movieTitleInput.addEventListener('input', handleAutocomplete);
+       // Hide autocomplete when clicking outside
+       document.addEventListener('click', (e) => {
+           if (!movieTitleInput.contains(e.target) && !autocompleteSuggestionsDiv.contains(e.target)) {
+               autocompleteSuggestionsDiv.innerHTML = '';
+           }
+       });
+
+
+       document.getElementById("removeMovieButton").addEventListener("click", () => {
+           const idx = parseInt(removeSelect.value, 10);
+           if (!isNaN(idx) && idx >= 0 && idx < entries.length) {
+               const removedMovieTitle = entries[idx].title;
+               entries.splice(idx, 1); // Remove movie from array
+               buildWheel(); // Rebuild wheel with updated entries
+               updateRemoveMenu(); // Update remove dropdown
+               localStorage.setItem("movieEntries", JSON.stringify(entries)); // Save to local storage
+               showToast(`${removedMovieTitle} removed.`, "info");
+               loadRecommendedMovies(); // Reload recommendations after adding/removing
+           } else {
+               showToast("No movie selected to remove.", "error");
+           }
+       });
+
+       toggleEditLink.addEventListener("click", (e) => {
+           e.preventDefault();
+           const expanded = editSection.classList.toggle("expanded");
+           toggleEditLink.textContent = expanded ? "➖ Hide Add/Remove Movies & Recommendations" : "➕ Show Add/Remove Movies & Recommendations";
+           // Scroll to the edit section if expanded on mobile for better UX
+           if (expanded && window.innerWidth < 768) {
+               editSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+           }
+       });
+
+       /**
+        * Initializes the application: loads movies, fetches data for defaults,
+        * builds the wheel, and loads history.
+        */
+       async function initializeApp() {
+           const storedEntries = JSON.parse(localStorage.getItem("movieEntries") || "[]");
+           let moviesToProcess = storedEntries.length > 0 ? storedEntries : defaultEntries;
+
+           // Fetch missing data for movies (e.g., if loaded from old storage or default)
+           const fetchPromises = moviesToProcess.map(async (entry) => {
+               // If movie already has poster, runtime, and director, use it. Otherwise, fetch.
+               if (entry.poster && entry.runtime && entry.title && entry.Director !== undefined) {
+                   return entry;
+               } else if (entry.title) {
+                   return await fetchMovieData(entry.title);
+               }
+               return null; // Should not happen if data is well-formed
+           }).filter(Boolean); // Filter out any nulls
+
+           entries = await Promise.all(fetchPromises);
+
+           // Filter out any entries that might have failed to fetch and don't have a title
+           entries = entries.filter(entry => entry && entry.title);
+
+           localStorage.setItem("movieEntries", JSON.stringify(entries)); // Save the fully hydrated list
+
+           buildWheel();
+           updateRemoveMenu();
+           loadHistory();
+           loadRecommendedMovies(); // Load recommendations on app start
+       }
+
+       // Initialize the app when the window loads
+       window.onload = initializeApp;
+   </script>
+   <script>
+   if ('serviceWorker' in navigator) {
+     window.addEventListener('load', function() {
+       navigator.serviceWorker.register('service-worker.js', {
+         scope: './'
+       })
+         .then(function(registration) {
+           console.log('ServiceWorker registration successful:', registration);
+         }, function(err) {
+           console.log('ServiceWorker registration failed:', err);
+         });
+     });
+   }
+   </script>
+   <script>
+       // --- iOS Add to Home Screen Banner ---
+       function isIos() {
+           return /iphone|ipad|ipod/i.test(navigator.userAgent);
+       }
+       function isInStandaloneMode() {
+           return (window.navigator.standalone === true) || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+       }
+       document.addEventListener('DOMContentLoaded', function() {
+           if (isIos() && !isInStandaloneMode()) {
+               document.getElementById('ios-install-banner').style.display = 'flex';
+           }
+       });
+       document.getElementById('ios-install-btn').addEventListener('click', function() {
+           document.getElementById('ios-install-modal').style.display = 'flex';
+       });
+       document.getElementById('close-ios-modal').addEventListener('click', function() {
+           document.getElementById('ios-install-modal').style.display = 'none';
+       });
+       // Hide modal if user clicks outside the modal content
+       document.getElementById('ios-install-modal').addEventListener('click', function(e) {
+           if (e.target === this) {
+               this.style.display = 'none';
+           }
+       });
+   </script>
+</body>
+</html>
+
