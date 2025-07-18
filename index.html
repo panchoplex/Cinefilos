@@ -741,10 +741,111 @@
        #history li img {
            max-height: 45px;
        }
-   }
+  }
 
-   /* iOS specific styles */
-   @supports (-webkit-touch-callout: none) {
+  /* Movie Pack Randomizer Styles */
+  .pack-carousel {
+      display: flex;
+      overflow-x: auto;
+      gap: 16px;
+      padding: 10px 0 20px;
+      perspective: 1000px;
+  }
+
+  .pack {
+      flex: 0 0 120px;
+      height: 160px;
+      border-radius: 10px;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .pack:hover {
+      transform: rotateY(15deg) scale(1.05);
+      box-shadow: 0 0 15px rgba(0,255,255,0.7);
+  }
+
+  .pack.selected {
+      box-shadow: 0 0 15px rgba(255,255,0,0.9);
+  }
+
+  .pack.opening {
+      animation: pack-open 0.6s forwards;
+  }
+
+  @keyframes pack-open {
+      0% { transform: rotateY(0) scale(1); opacity:1; }
+      100% { transform: rotateY(90deg) scale(0.9); opacity:0; }
+  }
+
+  .cards-container {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+  }
+
+  .card {
+      width: 120px;
+      height: 180px;
+      perspective: 800px;
+      cursor: pointer;
+  }
+
+  .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+  }
+
+  .card.flip .card-inner {
+      transform: rotateY(180deg);
+  }
+
+  .card-front,
+  .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      backface-visibility: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5px;
+      font-size: 0.9em;
+  }
+
+  .card-front {
+      transform: rotateY(180deg);
+      color: #fff;
+      background-size: cover;
+      background-position: center;
+  }
+
+  .card-back {
+      background: #1f1f2d;
+      color: #fff;
+  }
+
+  .card.chosen .card-inner {
+      transform: rotateY(180deg) scale(1.1);
+  }
+
+  .selected-movie-info {
+      margin-top: 15px;
+      text-align: center;
+  }
+
+  /* iOS specific styles */
+  @supports (-webkit-touch-callout: none) {
        body {
            -webkit-user-select: none;
            -webkit-touch-callout: none;
@@ -808,13 +909,20 @@
        <button id="removeMovieButton">Remove Selected Movie</button>
    </div>
 
-   <div id="recommendedMoviesSection">
-       <h2>✨ Recommended Movies</h2>
-       <div id="recommendedMoviesList">
-           <!-- Recommended movies will be loaded here by JS -->
-           <p id="loadingRecommendations" style="text-align: center; color: #b0b0b0;">Loading recommendations...</p>
-       </div>
-   </div>
+  <div id="recommendedMoviesSection">
+      <h2>✨ Recommended Movies</h2>
+      <div id="recommendedMoviesList">
+          <!-- Recommended movies will be loaded here by JS -->
+          <p id="loadingRecommendations" style="text-align: center; color: #b0b0b0;">Loading recommendations...</p>
+      </div>
+  </div>
+
+  <h2>🎲 Random Movie Pack Opening</h2>
+  <div id="packCarousel" class="pack-carousel"></div>
+  <div id="packOpenArea" style="display:none;">
+      <div id="cardsContainer" class="cards-container"></div>
+      <div id="selectedMovieInfo" class="selected-movie-info"></div>
+  </div>
 
    <script>
        // PWA Installation Logic
@@ -1561,10 +1669,108 @@
        }
 
        // Initialize the app when the window loads
-       window.onload = initializeApp;
-   </script>
-   <script>
-   if ('serviceWorker' in navigator) {
+        window.onload = initializeApp;
+    </script>
+
+    <script>
+        // --- Movie Pack Randomizer ---
+        const placeholderMovies = [
+            { title: 'Galaxy Raiders', year: 1984, description: 'Space heroes save the universe.' },
+            { title: 'Neon Nights', year: 1992, description: 'Cyberpunk adventures in a glowing city.' },
+            { title: 'Kung Fu Koalas', year: 1987, description: 'Martial arts marsupials fight crime.' },
+            { title: 'Robot Rebellion', year: 2001, description: 'AI uprising threatens humanity.' },
+            { title: 'Pirate Planet', year: 1978, description: 'Swashbucklers in outer space.' },
+            { title: 'Retro Rampage', year: 1995, description: 'Gamers battle through arcade worlds.' },
+            { title: 'Haunted High', year: 1989, description: 'Teens uncover ghosts at school.' },
+            { title: 'Samurai Suburbia', year: 1999, description: 'Ancient warriors in modern times.' },
+            { title: 'Laser Llamas', year: 1983, description: 'Llamas wield lasers to defend Earth.' },
+            { title: 'Quantum Quest', year: 2010, description: 'Scientists journey through time.' }
+        ];
+
+        function randomGradient() {
+            const colors = ['#ff007c', '#00ffd5', '#ff9900', '#00a1ff', '#a0ff00', '#ff00e6', '#ff3421', '#21ffb9', '#6542ff'];
+            const c1 = colors[Math.floor(Math.random()*colors.length)];
+            const c2 = colors[Math.floor(Math.random()*colors.length)];
+            return `linear-gradient(135deg, ${c1}, ${c2})`;
+        }
+
+        function pickRandomMovies(n) {
+            const chosen = [];
+            for (let i = 0; i < n; i++) {
+                const m = placeholderMovies[Math.floor(Math.random()*placeholderMovies.length)];
+                chosen.push(m);
+            }
+            return chosen;
+        }
+
+        function initPacks() {
+            const carousel = document.getElementById('packCarousel');
+            if (!carousel) return;
+            for (let i = 0; i < 5; i++) {
+                const p = document.createElement('div');
+                p.className = 'pack';
+                p.style.background = randomGradient();
+                p.addEventListener('click', () => openPack(p));
+                carousel.appendChild(p);
+            }
+        }
+
+        let selectedMovies = [];
+        let packOpened = false;
+
+        function openPack(packEl) {
+            if (packOpened) return;
+            packOpened = true;
+            packEl.classList.add('selected');
+            document.querySelectorAll('.pack').forEach(p => p.style.pointerEvents='none');
+            setTimeout(() => {
+                packEl.classList.add('opening');
+                setTimeout(showCards, 600);
+            }, 100);
+        }
+
+        function showCards() {
+            selectedMovies = pickRandomMovies(5);
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+            selectedMovies.forEach((movie) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<div class="card-inner"><div class="card-back">🎬</div><div class="card-front" style="background:${randomGradient()}"><span>${movie.title}</span></div></div>`;
+                card.addEventListener('click', () => revealMovie(card, movie));
+                container.appendChild(card);
+            });
+            document.getElementById('packOpenArea').style.display = 'block';
+            setTimeout(() => revealAllOnce(container.children), 700);
+        }
+
+        function revealAllOnce(cards) {
+            cards = Array.from(cards);
+            cards.forEach(c => c.classList.add('flip'));
+            setTimeout(() => {
+                cards.forEach(c => c.classList.remove('flip'));
+                shuffleCards(cards);
+            }, 1200);
+        }
+
+        function shuffleCards(cards) {
+            cards.forEach(c => c.style.order = Math.floor(Math.random()*5));
+        }
+
+        function revealMovie(card, movie) {
+            if (card.classList.contains('chosen')) return;
+            card.classList.add('flip', 'chosen');
+            triggerConfetti();
+            const info = document.getElementById('selectedMovieInfo');
+            info.innerHTML = `<h3>${movie.title} (${movie.year})</h3><p>${movie.description}</p>`;
+            info.scrollIntoView({behavior:'smooth'});
+        }
+
+        document.addEventListener('DOMContentLoaded', initPacks);
+    </script>
+
+    <script>
+    if ('serviceWorker' in navigator) {
      window.addEventListener('load', function() {
        navigator.serviceWorker.register('service-worker.js', {
          scope: './'
