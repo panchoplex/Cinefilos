@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, viewport-fit=cover'/>
-<title>Cinefilos - Movie Wheel Spinner</title>
+<title>Cinefilos - Movie Pack Randomizer</title>
 
 <!-- PWA Meta Tags -->
-<meta name="description" content="Spin the wheel to pick a movie and get recommendations! A fun way to decide what to watch.">
+<meta name="description" content="Open a random pack of movies and get recommendations! A fun way to decide what to watch.">
 <meta name="keywords" content="movie, wheel, spinner, recommendations, cinema, film">
 <meta name="author" content="Cinefilos">
 <meta name="robots" content="index, follow">
@@ -882,18 +882,11 @@
    </div>
 
    <h1>CINEFILOS</h1>
-
-   <div id="needle"></div>
-   <div id="wheel3d">
-       <!-- Slices will be built here by JS -->
-       <button id="spin">SPIN</button>
-   </div>
-
    <div id="result"></div>
    <div id="confetti-container"></div> <!-- Confetti container -->
    <div id="toast-container"></div> <!-- Toast notification container -->
 
-   <h2>📜 Spin History</h2>
+   <h2>📜 Pack History</h2>
    <ul id="history"></ul>
 
    <a href="#" id="toggleEdit">➕ Show Add/Remove Movies & Recommendations</a>
@@ -1035,8 +1028,8 @@
        let lastSpunMovieDetailedInfo = null; // Global to store info of last spun movie for recommendations
 
        // DOM Elements
-       const wheel = document.getElementById("wheel3d");
-       const spinBtn = document.getElementById("spin");
+       const wheel = null; // wheel removed
+       const spinBtn = null; // spin button removed
        const resultDiv = document.getElementById("result");
        const removeSelect = document.getElementById("removeMovieSelect");
        const addForm = document.getElementById("addMovieForm");
@@ -1141,47 +1134,11 @@
        }
 
        /**
-        * Dynamically builds the slices of the 3D wheel based on the 'entries' array.
+        * Previously built the spinning wheel slices.
+        * The wheel has been removed, so this now simply persists the list.
         */
        function buildWheel() {
-           // Remove all existing slices, keeping only the spin button
-           Array.from(wheel.children).forEach(child => {
-               if (child.id !== "spin") {
-                   wheel.removeChild(child);
-               }
-           });
-
-           if (entries.length === 0) {
-               // If no entries, display a message or a blank wheel
-               const noMoviesSlice = document.createElement("div");
-               noMoviesSlice.className = "slice";
-               noMoviesSlice.style.transform = `rotate(0deg) skewY(0deg)`; // Full circle
-               noMoviesSlice.style.backgroundColor = '#555';
-               noMoviesSlice.style.backgroundImage = `url('https://placehold.co/150x220/555555/ffffff?text=No+Movies+Yet!')`;
-               wheel.insertBefore(noMoviesSlice, spinBtn);
-               return;
-           }
-
-           const sliceDeg = 360 / entries.length;
-
-           entries.forEach((entry, i) => {
-               const slice = document.createElement("div");
-               slice.className = "slice";
-               slice.style.transform = `
-                   rotate(${i * sliceDeg}deg)
-                   skewY(${90 - sliceDeg}deg)
-               `;
-               // Set background image for the slice
-               if (entry.poster) {
-                   slice.style.backgroundImage = `url('${entry.poster}')`;
-               } else {
-                   // Fallback to a solid color and placeholder image if no poster
-                   const fallbackColor = (i % 2 === 0) ? '#3498db' : '#e74c3c';
-                   slice.style.backgroundColor = fallbackColor;
-                   slice.style.backgroundImage = `url('https://placehold.co/150x220/${fallbackColor.substring(1)}/ffffff?text=No+Poster')`;
-               }
-               wheel.insertBefore(slice, spinBtn); // Insert slices before the spin button
-           });
+           localStorage.setItem("movieEntries", JSON.stringify(entries));
        }
 
        /**
@@ -1562,14 +1519,13 @@
 
 
        // --- Event Listeners ---
-       spinBtn.addEventListener("click", spinWheel);
+
 
        addForm.addEventListener("submit", async (e) => {
            e.preventDefault();
            const title = movieTitleInput.value.trim();
            if (title) {
                addMovieSpinner.style.display = 'inline-block'; // Show spinner
-               spinBtn.disabled = true; // Disable spin button during fetch
                autocompleteSuggestionsDiv.innerHTML = ''; // Clear suggestions
                try {
                    // Check if movie is already in the list
@@ -1597,7 +1553,6 @@
                    showToast("Error adding movie. Please try again.", "error");
                } finally {
                    addMovieSpinner.style.display = 'none'; // Hide spinner
-                   spinBtn.disabled = false; // Re-enable spin button
                }
            } else {
                showToast("Please enter a movie title.", "error");
@@ -1787,6 +1742,7 @@
             `;
             info.scrollIntoView({behavior:'smooth'});
             lastSpunMovieDetailedInfo = details;
+            addToHistory(details.title, details.runtime || '–', details.poster);
             loadRecommendedMovies();
         }
 
