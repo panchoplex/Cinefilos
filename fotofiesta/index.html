@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>FotoFiesta</title>
+  <meta name="description" content="A playful photo booth PWA for quick snaps and delayed reveals.">
+  <meta name="theme-color" content="#111">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #111;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1rem;
+      text-align: center;
+      background: #1f1f1f;
+    }
+    main {
+      flex: 1;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .mode-select button {
+      margin: 0.25rem;
+      padding: 0.5rem 1rem;
+      background: #222;
+      border: 1px solid #444;
+      color: #fff;
+      border-radius: 4px;
+    }
+    .hidden { display: none; }
+    #camera-preview { width: 100%; max-width: 320px; background: #000; }
+    #strip img { width: 100px; margin: 2px; }
+    #cruda-gallery img { width: 80px; margin: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FotoFiesta</h1>
+    <div class="mode-select">
+      <button id="instant-mode-btn">Fotos Instantáneas</button>
+      <button id="cruda-mode-btn">Fotos d la Cruda</button>
+    </div>
+  </header>
+  <main>
+    <video id="camera-preview" autoplay playsinline></video>
+    <canvas id="capture-canvas" class="hidden"></canvas>
+
+    <section id="instant-section" class="hidden">
+      <button id="start-strip">Start Strip</button>
+      <div id="strip"></div>
+    </section>
+
+    <section id="cruda-section" class="hidden">
+      <label>Delay (hrs): <input type="number" id="delay-hours" value="12" min="1" max="72"></label>
+      <button id="take-cruda">Take Photo</button>
+      <div id="cruda-gallery"></div>
+    </section>
+  </main>
+
+  <script src="fotofiesta.js"></script>
+</body>
+</html>

@@ -156,3 +156,14 @@ For issues or questions about the PWA implementation, check:
 - Manifest tab for PWA installation criteria
 
 # Cinefilos
+
+## FotoFiesta Subpage
+A lightweight photo booth experience is available in the `fotofiesta` folder. The page works completely offline and can be deployed on GitHub Pages just like the main app.
+
+### Features
+- **Fotos d la Cruda**: photos remain locked for a chosen delay before appearing in the gallery.
+- **Fotos Instantáneas**: capture a quick strip of three photos with a countdown.
+- Works as a PWA with its own manifest and service worker.
+
+### Usage
+Open `fotofiesta/index.html` in your browser or deploy the entire repository to GitHub Pages and navigate to `/fotofiesta/`.
