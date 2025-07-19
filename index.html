@@ -1105,7 +1105,9 @@
                        title: data.Title,
                        runtime: data.Runtime && data.Runtime !== "N/A" ? data.Runtime : "–",
                        poster: data.Poster && data.Poster !== "N/A" ? data.Poster : null,
-                       Director: data.Director && data.Director !== "N/A" ? data.Director : null // Added Director
+                       Director: data.Director && data.Director !== "N/A" ? data.Director : null,
+                       year: data.Year && data.Year !== "N/A" ? data.Year : null,
+                       description: data.Plot && data.Plot !== "N/A" ? data.Plot : null
                    };
                } else {
                    console.warn(`Movie not found or error for "${title}": ${data.Error}`);
@@ -1499,7 +1501,7 @@
                            <strong>${movie.title}</strong>
                            <span>${movie.runtime}</span>
                        </div>
-                       <button class="add-recommended-btn" data-title="${movie.title}">Add to Wheel</button>
+                       <button class="add-recommended-btn" data-title="${movie.title}">Add to List</button>
                    `;
                    recommendedMoviesListDiv.appendChild(card);
                });
@@ -1508,7 +1510,7 @@
                if (targetDirectors.length > 0) {
                    msg = `No recommendations by director(s) "${targetDirectors.join(', ')}" found in our curated list. Showing general popular movies.`;
                } else {
-                   msg = "No general popular movies could be recommended right now. Try adding movies to your wheel and spinning!";
+                   msg = "No general popular movies could be recommended right now. Try adding movies to your list and spinning!";
                }
                recommendedMoviesListDiv.innerHTML = `<p style="text-align: center; color: #b0b0b0;">${msg}</p>`;
            }
@@ -1529,7 +1531,7 @@
                            <span>${badMovieData.runtime}</span>
                            <p style="font-size: 0.8em; color: #ffcc00; margin-top: 5px;">(For a laugh!)</p>
                        </div>
-                       <button class="add-recommended-btn" data-title="${badMovieData.title}">Add to Wheel</button>
+                       <button class="add-recommended-btn" data-title="${badMovieData.title}">Add to List</button>
                    `;
                    recommendedMoviesListDiv.appendChild(badMovieCard);
                    addedToRecommendations.add(badMovieData.title.toLowerCase()); // Prevent duplicates in this session
@@ -1537,7 +1539,7 @@
            }
            // --- End 6th recommendation ---
 
-           // Re-add event listeners for all "Add to Wheel" buttons (including the new bad movie one)
+           // Re-add event listeners for all "Add to List" buttons (including the new bad movie one)
            recommendedMoviesListDiv.querySelectorAll('.add-recommended-btn').forEach(button => {
                button.addEventListener('click', async (e) => {
                    const titleToAdd = e.target.dataset.title;
@@ -1547,10 +1549,10 @@
                        buildWheel();
                        updateRemoveMenu();
                        localStorage.setItem("movieEntries", JSON.stringify(entries));
-                       showToast(`${movieData.title} added to your wheel!`, "success");
+                       showToast(`${movieData.title} added to your list!`, "success");
                        loadRecommendedMovies(); // Reload recommendations to remove added movie
                    } else if (entries.some(entry => entry.title.toLowerCase() === titleToAdd.toLowerCase())) {
-                       showToast(`${titleToAdd} is already on your wheel.`, "info");
+                       showToast(`${titleToAdd} is already on your list.`, "info");
                    } else {
                        showToast(`Could not add "${titleToAdd}".`, "error");
                    }
@@ -1573,7 +1575,7 @@
                    // Check if movie is already in the list
                    const isOnWheel = entries.some(entry => entry.title.toLowerCase() === title.toLowerCase());
                    if (isOnWheel) {
-                       showToast(`${title} is already on your wheel.`, "info");
+                       showToast(`${title} is already on your list.`, "info");
                        return;
                    }
 
@@ -1695,10 +1697,11 @@
         }
 
         function pickRandomMovies(n) {
+            const pool = entries && entries.length > 0 ? entries : placeholderMovies;
             const chosen = [];
             for (let i = 0; i < n; i++) {
-                const m = placeholderMovies[Math.floor(Math.random()*placeholderMovies.length)];
-                chosen.push(m);
+                const m = pool[Math.floor(Math.random() * pool.length)];
+                chosen.push({ ...m });
             }
             return chosen;
         }
@@ -1736,7 +1739,10 @@
             selectedMovies.forEach((movie) => {
                 const card = document.createElement('div');
                 card.className = 'card';
-                card.innerHTML = `<div class="card-inner"><div class="card-back">🎬</div><div class="card-front" style="background:${randomGradient()}"><span>${movie.title}</span></div></div>`;
+                const posterStyle = movie.poster ?
+                    `background-image:url('${movie.poster}');background-size:cover;background-position:center;` :
+                    `background:${randomGradient()}`;
+                card.innerHTML = `<div class="card-inner"><div class="card-back">🎬</div><div class="card-front" style="${posterStyle}"><span>${movie.title}</span></div></div>`;
                 card.addEventListener('click', () => revealMovie(card, movie));
                 container.appendChild(card);
             });
@@ -1757,13 +1763,31 @@
             cards.forEach(c => c.style.order = Math.floor(Math.random()*5));
         }
 
-        function revealMovie(card, movie) {
+        async function revealMovie(card, movie) {
             if (card.classList.contains('chosen')) return;
             card.classList.add('flip', 'chosen');
             triggerConfetti();
             const info = document.getElementById('selectedMovieInfo');
-            info.innerHTML = `<h3>${movie.title} (${movie.year})</h3><p>${movie.description}</p>`;
+
+            let details = movie;
+            if (!movie.year || !movie.description) {
+                try {
+                    const fetched = await fetchMovieData(movie.title);
+                    details = { ...movie, ...fetched };
+                } catch(e) {
+                    console.error('Error fetching details for', movie.title, e);
+                }
+            }
+
+            const posterSrc = details.poster || `https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster`;
+            info.innerHTML = `
+                <img src="${posterSrc}" alt="${details.title} poster" onerror="this.onerror=null;this.src='https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster';">
+                <h3>${details.title}${details.year ? ` (${details.year})` : ''}</h3>
+                ${details.description ? `<p>${details.description}</p>` : ''}
+            `;
             info.scrollIntoView({behavior:'smooth'});
+            lastSpunMovieDetailedInfo = details;
+            loadRecommendedMovies();
         }
 
         document.addEventListener('DOMContentLoaded', initPacks);
