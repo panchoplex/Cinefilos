@@ -167,3 +167,4 @@ A lightweight photo booth experience is available in the `fotofiesta` folder. Th
 
 ### Usage
 Open `fotofiesta/index.html` in your browser or deploy the entire repository to GitHub Pages and navigate to `/fotofiesta/`.
+You can also access FotoFiesta from the main page via the "Open FotoFiesta" button.

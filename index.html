@@ -315,7 +315,7 @@
        color: #a0a0a0;
    }
 
-   button[type="submit"], #removeMovieButton, .add-recommended-btn, #resetPackButton {
+   button[type="submit"], #removeMovieButton, .add-recommended-btn, #resetPackButton, #fotofiestaBtn {
        cursor: pointer;
        background: linear-gradient(145deg, #3498db, #2980b9);
        border: none;
@@ -325,7 +325,7 @@
        text-transform: uppercase;
    }
 
-   button[type="submit"]:hover, #removeMovieButton:hover, .add-recommended-btn:hover, #resetPackButton:hover {
+   button[type="submit"]:hover, #removeMovieButton:hover, .add-recommended-btn:hover, #resetPackButton:hover, #fotofiestaBtn:hover {
        background: linear-gradient(145deg, #2980b9, #3498db);
        transform: translateY(-2px);
    }
@@ -345,6 +345,15 @@
   #resetPackButton:hover {
       background: linear-gradient(145deg, #6c3483, #8e44ad);
   }
+
+  #fotofiestaBtn {
+      display: block;
+      max-width: 220px;
+      margin: 20px auto;
+      text-align: center;
+      text-decoration: none;
+  }
+
 
    /* History Section */
    #history {
@@ -770,6 +779,7 @@
    </div>
 
    <h1>CINEFILOS</h1>
+  <a href="fotofiesta/" id="fotofiestaBtn">📸 Open FotoFiesta</a>
    <div id="result"></div>
   <div id="confetti-container"></div> <!-- Confetti container -->
   <div id="toast-container"></div> <!-- Toast notification container -->
