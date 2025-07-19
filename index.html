@@ -643,15 +643,16 @@
   /* Movie Pack Randomizer Styles */
   .pack-carousel {
       display: flex;
-      overflow-x: auto;
-      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
       padding: 10px 0 20px;
       perspective: 1000px;
   }
 
   .pack {
-      flex: 0 0 120px;
-      height: 160px;
+      width: 90px;
+      height: 130px;
       border-radius: 10px;
       background-size: cover;
       background-position: center;
@@ -957,13 +958,14 @@
 
        /**
         * Fetches movie data from the OMDb API.
-        * @param {string} title - The title of the movie to search for.
-        * @returns {Promise<Object>} A promise that resolves with movie data (title, runtime, poster, director)
-        * or a fallback object if not found/error.
+        * @param {Object} entry - Movie entry with at least a title and optional imdb id.
+        * @returns {Promise<Object>} Movie data (title, runtime, poster, director).
         */
-       async function fetchMovieData(title) {
+       async function fetchMovieData(entry) {
            const apiKey = "225d3569"; // OMDb API Key
-           const url = `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(title)}`;
+           const url = entry.imdb ?
+               `https://www.omdbapi.com/?apikey=${apiKey}&i=${entry.imdb}` :
+               `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(entry.title)}`;
            try {
                const res = await fetch(url);
                const data = await res.json();
@@ -1216,7 +1218,7 @@
                      continue; // Skip if already in list or already considered for recommendations
                    }
 
-                   const movieFullDetails = await fetchMovieData(title);
+                   const movieFullDetails = await fetchMovieData({ title });
                    if (movieFullDetails.title && movieFullDetails.Director && movieFullDetails.Director.toLowerCase() === director) {
                        recommendations.push(movieFullDetails);
                        addedToRecommendations.add(movieFullDetails.title.toLowerCase());
@@ -1231,7 +1233,7 @@
                    if (processedTitles.has(title.toLowerCase()) || addedToRecommendations.has(title.toLowerCase())) {
                      continue; // Skip if already in list or already recommended
                    }
-                   const movieFullDetails = await fetchMovieData(title);
+                   const movieFullDetails = await fetchMovieData({ title });
                    if (movieFullDetails.title) {
                        recommendations.push(movieFullDetails);
                        addedToRecommendations.add(movieFullDetails.title.toLowerCase());
@@ -1270,7 +1272,7 @@
            // --- Add the 6th "bad movie" recommendation ---
            if (lowRatedMovieTitles.length > 0) {
                const randomBadMovieTitle = lowRatedMovieTitles[Math.floor(Math.random() * lowRatedMovieTitles.length)];
-               const badMovieData = await fetchMovieData(randomBadMovieTitle);
+               const badMovieData = await fetchMovieData({ title: randomBadMovieTitle });
 
                if (badMovieData.title && !processedTitles.has(badMovieData.title.toLowerCase())) { // Ensure it's not already in the list
                    const badMovieCard = document.createElement('div');
@@ -1295,7 +1297,7 @@
            recommendedMoviesListDiv.querySelectorAll('.add-recommended-btn').forEach(button => {
                button.addEventListener('click', async (e) => {
                    const titleToAdd = e.target.dataset.title;
-                   const movieData = await fetchMovieData(titleToAdd); // Fetch data to ensure consistency
+                   const movieData = await fetchMovieData({ title: titleToAdd }); // Fetch data to ensure consistency
                    if (movieData.title === titleToAdd && !entries.some(entry => entry.title.toLowerCase() === titleToAdd.toLowerCase())) {
                        entries.push(movieData);
                        buildWheel();
@@ -1330,7 +1332,7 @@
                        return;
                    }
 
-                   const movieData = await fetchMovieData(title);
+                   const movieData = await fetchMovieData({ title });
                    if (movieData.title === title) { // Check if the title matches (i.e., not a generic fallback)
                        entries.push(movieData);
                        showToast(`${movieData.title} added!`, "success");
@@ -1418,7 +1420,7 @@
                if (entry.poster && entry.runtime && entry.title && entry.Director !== undefined) {
                    return entry;
                } else if (entry.title) {
-                   return await fetchMovieData(entry.title);
+                   return await fetchMovieData(entry);
                }
                return null; // Should not happen if data is well-formed
            }).filter(Boolean); // Filter out any nulls
@@ -1482,7 +1484,7 @@
         function initPacks() {
             const carousel = document.getElementById('packCarousel');
             if (!carousel) return;
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 3; i++) {
                 const p = document.createElement('div');
                 p.className = 'pack';
                 p.style.background = randomGradient();
@@ -1515,7 +1517,7 @@
                 const posterStyle = movie.poster ?
                     `background-image:url('${movie.poster}');background-size:cover;background-position:center;` :
                     `background:${randomGradient()}`;
-                card.innerHTML = `<div class="card-inner"><div class="card-back">🎬</div><div class="card-front" style="${posterStyle}"><span>${movie.title}</span></div></div>`;
+                card.innerHTML = `<div class="card-inner"><div class="card-back">🎬</div><div class="card-front" style="${posterStyle}"></div></div>`;
                 card.addEventListener('click', () => revealMovie(card, movie));
                 container.appendChild(card);
             });
@@ -1557,7 +1559,7 @@
             let details = movie;
             if (!movie.year || !movie.description) {
                 try {
-                    const fetched = await fetchMovieData(movie.title);
+                    const fetched = await fetchMovieData(movie);
                     details = { ...movie, ...fetched };
                 } catch(e) {
                     console.error('Error fetching details for', movie.title, e);

@@ -1,128 +1,132 @@
-let video = document.getElementById('camera-preview');
-let canvas = document.getElementById('capture-canvas');
-let instantSection = document.getElementById('instant-section');
-let crudaSection = document.getElementById('cruda-section');
-let stripDiv = document.getElementById('strip');
-let galleryDiv = document.getElementById('cruda-gallery');
+const video = document.getElementById('camera-preview');
+const canvas = document.getElementById('capture-canvas');
+const galleryDiv = document.getElementById('cruda-gallery');
+const sessionArea = document.getElementById('sessionArea');
+const setupDiv = document.getElementById('setup');
+const usernameInput = document.getElementById('usernameInput');
+const revealInput = document.getElementById('revealInput');
+const createSessionBtn = document.getElementById('createSessionBtn');
+const joinSessionBtn = document.getElementById('joinSessionBtn');
+const joinSessionArea = document.getElementById('joinSessionArea');
+const qrContainer = document.getElementById('qrContainer');
+const sessionInfo = document.getElementById('sessionInfo');
+const takePhotoBtn = document.getElementById('takePhotoBtn');
 
-const instantModeBtn = document.getElementById('instant-mode-btn');
-const crudaModeBtn = document.getElementById('cruda-mode-btn');
+let currentSessionId = null;
+let currentSession = null;
+let username = null;
 
-instantModeBtn.onclick = () => {
-  instantSection.classList.remove('hidden');
-  crudaSection.classList.add('hidden');
-};
+function getSessions() {
+  return JSON.parse(localStorage.getItem('ff_sessions') || '{}');
+}
 
-crudaModeBtn.onclick = () => {
-  crudaSection.classList.remove('hidden');
-  instantSection.classList.add('hidden');
-  loadCrudaGallery();
-};
+function saveSessions(data) {
+  localStorage.setItem('ff_sessions', JSON.stringify(data));
+}
 
 async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     video.srcObject = stream;
-  } catch (err) {
+  } catch(err) {
     console.error('Camera error', err);
   }
 }
 
-startCamera();
-
-// Instant Mode
-const startStripBtn = document.getElementById('start-strip');
-startStripBtn.onclick = async () => {
-  stripDiv.innerHTML = '';
-  for (let i = 0; i < 3; i++) {
-    await countdown(3);
-    const img = takePhoto();
-    stripDiv.appendChild(img);
-  }
-};
-
-function countdown(sec) {
-  return new Promise(resolve => {
-    let counter = sec;
-    const overlay = document.createElement('div');
-    overlay.style.position = 'absolute';
-    overlay.style.top = '50%';
-    overlay.style.left = '50%';
-    overlay.style.transform = 'translate(-50%, -50%)';
-    overlay.style.fontSize = '48px';
-    document.body.appendChild(overlay);
-    const interval = setInterval(() => {
-      overlay.textContent = counter;
-      counter--;
-      if (counter < 0) {
-        clearInterval(interval);
-        document.body.removeChild(overlay);
-        resolve();
-      }
-    }, 1000);
-  });
-}
-
-function takePhoto() {
-  const context = canvas.getContext('2d');
+function capturePhoto() {
+  const ctx = canvas.getContext('2d');
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  context.drawImage(video, 0, 0);
-  const data = canvas.toDataURL('image/png');
-  const img = new Image();
-  img.src = data;
-  return img;
+  ctx.drawImage(video, 0, 0);
+  return canvas.toDataURL('image/png');
 }
 
-// Cruda Mode
-const takeCrudaBtn = document.getElementById('take-cruda');
-takeCrudaBtn.onclick = () => {
-  const img = takePhoto();
-  const delayHours = parseInt(document.getElementById('delay-hours').value, 10);
-  const revealAt = Date.now() + delayHours * 60 * 60 * 1000;
-  const entry = { img: img.src, revealAt };
-  const items = JSON.parse(localStorage.getItem('crudaPhotos') || '[]');
-  items.push(entry);
-  localStorage.setItem('crudaPhotos', JSON.stringify(items));
-  loadCrudaGallery();
-};
-
-function loadCrudaGallery() {
+function loadGallery() {
   galleryDiv.innerHTML = '';
-  const items = JSON.parse(localStorage.getItem('crudaPhotos') || '[]');
   const now = Date.now();
-  items.forEach((item, index) => {
+  const photos = currentSession.photos || [];
+  photos.forEach(p => {
     const wrapper = document.createElement('div');
     const img = new Image();
-    if (now >= item.revealAt) {
-      img.src = item.img;
+    if (now >= currentSession.revealAt) {
+      img.src = p.img;
+      const caption = document.createElement('div');
+      caption.textContent = p.user;
+      wrapper.appendChild(img);
+      wrapper.appendChild(caption);
     } else {
-      img.src = '';
       img.alt = 'Locked';
-      const remaining = Math.max(0, item.revealAt - now);
-      const span = document.createElement('span');
-      span.textContent = formatRemaining(remaining);
-      wrapper.appendChild(span);
-      setInterval(() => {
-        const left = item.revealAt - Date.now();
-        span.textContent = formatRemaining(left);
-        if (left <= 0) loadCrudaGallery();
-      }, 1000);
+      wrapper.textContent = 'Locked until ' + new Date(currentSession.revealAt).toLocaleString();
     }
     wrapper.appendChild(img);
     galleryDiv.appendChild(wrapper);
   });
 }
 
-function formatRemaining(ms) {
-  if (ms <= 0) return 'Ready';
-  const totalSec = Math.floor(ms / 1000);
-  const h = Math.floor(totalSec / 3600);
-  const m = Math.floor((totalSec % 3600) / 60);
-  const s = totalSec % 60;
-  return `${h}h ${m}m ${s}s`;
+function generateQr() {
+  qrContainer.innerHTML = '';
+  const url = `${location.origin}${location.pathname}?session=${currentSessionId}`;
+  QRCode.toCanvas(url, { width: 200 }, function (err, canvas) {
+    if (!err) qrContainer.appendChild(canvas);
+  });
+}
+
+function startSession(isCreator) {
+  setupDiv.classList.add('hidden');
+  sessionArea.classList.remove('hidden');
+  startCamera();
+  sessionInfo.textContent = 'Reveal at ' + new Date(currentSession.revealAt).toLocaleString();
+  if (isCreator) generateQr();
+  else qrContainer.classList.add('hidden');
+  loadGallery();
+}
+
+createSessionBtn.onclick = () => {
+  username = usernameInput.value.trim();
+  const revealAt = new Date(revealInput.value).getTime();
+  if (!username || !revealAt) {
+    alert('Enter username and reveal time');
+    return;
+  }
+  currentSessionId = 's' + Date.now();
+  const sessions = getSessions();
+  sessions[currentSessionId] = { revealAt, photos: [], creator: username };
+  saveSessions(sessions);
+  currentSession = sessions[currentSessionId];
+  startSession(true);
+};
+
+joinSessionBtn.onclick = () => {
+  username = usernameInput.value.trim();
+  if (!username) { alert('Enter username'); return; }
+  const sessions = getSessions();
+  currentSession = sessions[currentSessionId];
+  if (!currentSession) { alert('Session not found'); return; }
+  startSession(false);
+};
+
+takePhotoBtn.onclick = () => {
+  const data = capturePhoto();
+  const sessions = getSessions();
+  const sess = sessions[currentSessionId];
+  if (!sess) return;
+  sess.photos.push({ img: data, user: username });
+  saveSessions(sessions);
+  loadGallery();
+};
+
+function init() {
+  const urlParams = new URLSearchParams(location.search);
+  const sid = urlParams.get('session');
+  if (sid) {
+    currentSessionId = sid;
+    joinSessionArea.classList.remove('hidden');
+    document.getElementById('createSessionArea').classList.add('hidden');
+  }
 }
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js');
 }
+
+document.addEventListener('DOMContentLoaded', init);
