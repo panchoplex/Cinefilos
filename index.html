@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, viewport-fit=cover'/>
-<title>Cinefilos - Movie Wheel Spinner</title>
+<title>Cinefilos - Movie Pack Randomizer</title>
 
 <!-- PWA Meta Tags -->
-<meta name="description" content="Spin the wheel to pick a movie and get recommendations! A fun way to decide what to watch.">
-<meta name="keywords" content="movie, wheel, spinner, recommendations, cinema, film">
+<meta name="description" content="Open a random pack of movies and get recommendations! A fun way to decide what to watch.">
+<meta name="keywords" content="movie pack, randomizer, recommendations, cinema, film">
 <meta name="author" content="Cinefilos">
 <meta name="robots" content="index, follow">
 
@@ -43,7 +43,7 @@
 <link rel="apple-touch-startup-image" href="splash-1536x2048.png" media="(min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2)">
 
 <!-- PWA Manifest -->
-<link rel="manifest" href="/Cinefilos/manifest.json"
+<link rel="manifest" href="manifest.json">
    
 <!-- Standard Icons -->
 <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
@@ -69,8 +69,7 @@
 <!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<!-- External Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+<!-- External Scripts (none currently) -->
 
 <style>
    /* Keyframe Animations */
@@ -132,7 +131,7 @@
        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); /* Shadow for banner effect */
        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Text shadow for depth */
        position: relative; /* For z-index if needed */
-       z-index: 5; /* Ensure it's above general content but below needle */
+       z-index: 5; /* Ensure it's above general content */
    }
 
    h2 {
@@ -178,113 +177,6 @@
        background: rgba(255, 255, 255, 0.3);
    }
 
-   /* Needle Styling */
-   #needle {
-       width: 0;
-       height: 0;
-       margin: 0 auto;
-       border-left: 20px solid transparent; /* Slightly wider */
-       border-right: 20px solid transparent; /* Slightly wider */
-       border-bottom: 40px solid #e74c3c; /* Taller */
-       position: relative;
-       top: 25px; /* Adjust position for taller needle */
-       filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.7)); /* Stronger shadow */
-       z-index: 10;
-   }
-
-   /* 3D Wheel Container */
-   #wheel3d {
-       position: relative;
-       margin: 30px auto;
-       width: 320px;
-       height: 320px;
-       border-radius: 50%;
-       border: 8px solid #3a3a5e;
-       overflow: hidden;
-       transform-style: preserve-3d;
-       transition: transform 4s ease-out;
-       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.05);
-       z-index: 1;
-       animation: glowing-border 3s infinite alternate ease-in-out; /* Glowing animation */
-   }
-
-   /* Slice Styling */
-   .slice {
-       position: absolute;
-       width: 50%;
-       height: 50%;
-       background-color: #3498db; /* Default fallback color */
-       background-size: cover;
-       background-position: center;
-       color: white; /* Text color, though no text now */
-       display: flex; /* Kept flex for potential future content */
-       justify-content: flex-end;
-       align-items: center;
-       transform-origin: 100% 100%;
-       clip-path: polygon(100% 100%, 0 100%, 100% 0);
-       border-right: 1px solid rgba(0, 0, 0, 0.2);
-       box-sizing: border-box;
-       padding-right: 8px;
-       overflow: hidden;
-       /* Added overlay for better poster visibility */
-       position: absolute; /* Ensure overlay covers slice */
-   }
-
-   .slice::after {
-       content: '';
-       position: absolute;
-       top: 0;
-       left: 0;
-       right: 0;
-       bottom: 0;
-       background: rgba(0, 0, 0, 0.3); /* Dark overlay for contrast */
-       z-index: 2; /* Above image, below text if any */
-   }
-
-   .slice:nth-child(even) {
-       background-color: #e74c3c;
-   }
-
-   /* Spin Button Styling */
-   #spin {
-       position: absolute;
-       top: 50%;
-       left: 50%;
-       transform: translate(-50%, -50%);
-       width: 100px; /* Make it a fixed size for circle */
-       height: 100px; /* Make it a fixed size for circle */
-       padding: 0; /* Remove padding to control size with width/height */
-       font-size: 20px;
-       border: none;
-       border-radius: 50%; /* Make it circular */
-       background: linear-gradient(145deg, #2ecc71, #27ae60);
-       color: white;
-       cursor: pointer;
-       z-index: 20;
-       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-       transition: all 0.3s ease;
-       font-weight: 700;
-       letter-spacing: 0.5px;
-       text-transform: uppercase;
-       display: flex; /* Use flex to center text vertically and horizontally */
-       justify-content: center;
-       align-items: center;
-       /* Touch-friendly for mobile */
-       touch-action: manipulation;
-       -webkit-tap-highlight-color: transparent;
-   }
-
-   #spin:hover {
-       background: linear-gradient(145deg, #27ae60, #2ecc71);
-       transform: translate(-50%, -50%) scale(1.08);
-       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
-   }
-
-   #spin:active {
-       background: #239b56;
-       transform: translate(-50%, -50%) scale(0.95);
-       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-   }
 
    /* Result Display Area */
    #result {
@@ -358,24 +250,28 @@
 
 
    /* Toggle Edit Link */
-   #toggleEdit {
-       display: block;
-       margin-top: 30px;
-       color: #66bbff;
-       text-decoration: none;
-       cursor: pointer;
-       user-select: none;
-       font-size: 18px;
-       transition: color 0.3s ease, transform 0.2s ease;
-       font-weight: 600;
-       touch-action: manipulation;
-       -webkit-tap-highlight-color: transparent;
-   }
+  #toggleEdit,
+  #toggleHistory,
+  #toggleRecommendations {
+      display: block;
+      margin-top: 30px;
+      color: #66bbff;
+      text-decoration: none;
+      cursor: pointer;
+      user-select: none;
+      font-size: 18px;
+      transition: color 0.3s ease, transform 0.2s ease;
+      font-weight: 600;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+  }
 
-   #toggleEdit:hover {
-       color: #99ddff;
-       transform: translateY(-2px);
-   }
+  #toggleEdit:hover,
+  #toggleHistory:hover,
+  #toggleRecommendations:hover {
+      color: #99ddff;
+      transform: translateY(-2px);
+  }
 
    /* Collapsible Edit Section */
    .collapsible {
@@ -419,7 +315,7 @@
        color: #a0a0a0;
    }
 
-   button[type="submit"], #removeMovieButton, .add-recommended-btn {
+   button[type="submit"], #removeMovieButton, .add-recommended-btn, #resetPackButton, #fotofiestaBtn {
        cursor: pointer;
        background: linear-gradient(145deg, #3498db, #2980b9);
        border: none;
@@ -429,7 +325,7 @@
        text-transform: uppercase;
    }
 
-   button[type="submit"]:hover, #removeMovieButton:hover, .add-recommended-btn:hover {
+   button[type="submit"]:hover, #removeMovieButton:hover, .add-recommended-btn:hover, #resetPackButton:hover, #fotofiestaBtn:hover {
        background: linear-gradient(145deg, #2980b9, #3498db);
        transform: translateY(-2px);
    }
@@ -438,9 +334,26 @@
        background: linear-gradient(145deg, #e74c3c, #c0392b);
    }
 
-   #removeMovieButton:hover {
-       background: linear-gradient(145deg, #c0392b, #e74c3c);
-   }
+  #removeMovieButton:hover {
+      background: linear-gradient(145deg, #c0392b, #e74c3c);
+  }
+
+  #resetPackButton {
+      background: linear-gradient(145deg, #8e44ad, #6c3483);
+  }
+
+  #resetPackButton:hover {
+      background: linear-gradient(145deg, #6c3483, #8e44ad);
+  }
+
+  #fotofiestaBtn {
+      display: block;
+      max-width: 220px;
+      margin: 20px auto;
+      text-align: center;
+      text-decoration: none;
+  }
+
 
    /* History Section */
    #history {
@@ -681,15 +594,7 @@
        h2 {
            font-size: 1.4em;
        }
-       #wheel3d {
-           width: 280px;
-           height: 280px;
-       }
-       #spin {
-           width: 90px;
-           height: 90px;
-           font-size: 18px;
-       }
+       /* Former wheel styles removed */
        #result {
            width: 95%;
            padding: 15px;
@@ -697,7 +602,7 @@
        #result img {
            max-height: 120px;
        }
-       .collapsible, #history, #recommendedMoviesSection {
+       .collapsible, #historySection, #recommendedMoviesSection {
            max-width: 95%;
            padding: 15px;
        }
@@ -726,25 +631,120 @@
    }
 
    @media (max-width: 400px) {
-       #wheel3d {
-           width: 240px;
-           height: 240px;
-       }
-       #spin {
-           width: 80px;
-           height: 80px;
-           font-size: 16px;
-       }
+       /* Former wheel styles removed */
        #result img {
            max-height: 90px;
        }
        #history li img {
            max-height: 45px;
        }
-   }
+  }
 
-   /* iOS specific styles */
-   @supports (-webkit-touch-callout: none) {
+  /* Movie Pack Randomizer Styles */
+  .pack-carousel {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      padding: 10px 0 20px;
+      perspective: 1000px;
+  }
+
+  .pack {
+      width: 90px;
+      height: 130px;
+      border-radius: 10px;
+      background-size: cover;
+      background-position: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+
+  .pack:hover {
+      transform: rotateY(15deg) scale(1.05);
+      box-shadow: 0 0 15px rgba(0,255,255,0.7);
+  }
+
+  .pack.selected {
+      box-shadow: 0 0 15px rgba(255,255,0,0.9);
+  }
+
+  .pack.opening {
+      animation: pack-open 0.6s forwards;
+  }
+
+  @keyframes pack-open {
+      0% { transform: rotateY(0) scale(1); opacity:1; }
+      100% { transform: rotateY(90deg) scale(0.9); opacity:0; }
+  }
+
+  .cards-container {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+  }
+
+  .card {
+      width: 120px;
+      height: 180px;
+      perspective: 800px;
+      cursor: pointer;
+  }
+
+  .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+  }
+
+  .card.flip .card-inner {
+      transform: rotateY(180deg);
+  }
+
+  .card-front,
+  .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
+      backface-visibility: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 5px;
+      font-size: 0.9em;
+  }
+
+  .card-front {
+      transform: rotateY(180deg);
+      color: #fff;
+      background-size: cover;
+      background-position: center;
+  }
+
+  .card-back {
+      background: #1f1f2d;
+      color: #fff;
+  }
+
+  .card.chosen .card-inner {
+      transform: rotateY(180deg) scale(1.1);
+  }
+
+  .selected-movie-info {
+      margin-top: 15px;
+      text-align: center;
+  }
+
+  /* iOS specific styles */
+  @supports (-webkit-touch-callout: none) {
        body {
            -webkit-user-select: none;
            -webkit-touch-callout: none;
@@ -781,19 +781,24 @@
    </div>
 
    <h1>CINEFILOS</h1>
-
-   <div id="needle"></div>
-   <div id="wheel3d">
-       <!-- Slices will be built here by JS -->
-       <button id="spin">SPIN</button>
-   </div>
-
+  <a href="fotofiesta/" id="fotofiestaBtn">📸 Open FotoFiesta</a>
    <div id="result"></div>
-   <div id="confetti-container"></div> <!-- Confetti container -->
-   <div id="toast-container"></div> <!-- Toast notification container -->
+  <div id="confetti-container"></div> <!-- Confetti container -->
+  <div id="toast-container"></div> <!-- Toast notification container -->
 
-   <h2>📜 Spin History</h2>
-   <ul id="history"></ul>
+  <h2>🎲 Random Movie Pack Opening</h2>
+  <div id="packCarousel" class="pack-carousel"></div>
+  <div id="packOpenArea" style="display:none;">
+      <div id="cardsContainer" class="cards-container"></div>
+      <div id="selectedMovieInfo" class="selected-movie-info"></div>
+      <button id="resetPackButton">Reset Pack</button>
+  </div>
+
+  <a href="#" id="toggleHistory">➖ Hide Pack History</a>
+  <div id="historySection" class="collapsible expanded">
+      <h2>📜 Pack History</h2>
+      <ul id="history"></ul>
+  </div>
 
    <a href="#" id="toggleEdit">➕ Show Add/Remove Movies & Recommendations</a>
    <div id="editSection" class="collapsible">
@@ -808,13 +813,16 @@
        <button id="removeMovieButton">Remove Selected Movie</button>
    </div>
 
-   <div id="recommendedMoviesSection">
-       <h2>✨ Recommended Movies</h2>
-       <div id="recommendedMoviesList">
-           <!-- Recommended movies will be loaded here by JS -->
-           <p id="loadingRecommendations" style="text-align: center; color: #b0b0b0;">Loading recommendations...</p>
-       </div>
-   </div>
+  <a href="#" id="toggleRecommendations">➖ Hide Recommendations</a>
+  <div id="recommendedMoviesSection" class="collapsible expanded">
+      <h2>✨ Recommended Movies</h2>
+      <div id="recommendedMoviesList">
+          <!-- Recommended movies will be loaded here by JS -->
+          <p id="loadingRecommendations" style="text-align: center; color: #b0b0b0;">Loading recommendations...</p>
+      </div>
+  </div>
+
+
 
    <script>
        // PWA Installation Logic
@@ -864,16 +872,16 @@
 
        // Default movies - these will be populated with poster data on load
        const defaultEntries = [
-           { title: "Atroz" },
-           { title: "Death Race 2000" },
-           { title: "Up in Smoke" },
-           { title: "Cementerio del Terror" },
-           { title: "Cujo" },
-           { title: "Detroit Rock City" },
-           { title: "Good Burger" },
-           { title: "The Cable Guy" },
-           { title: "Hard Target" },
-           { title: "The Room" }
+           { title: "Atroz", imdb: "tt2952602" },
+           { title: "Death Race 2000", imdb: "tt0072856" },
+           { title: "Up in Smoke", imdb: "tt0078446" },
+           { title: "Cementerio del Terror", imdb: "tt0255159" },
+           { title: "Cujo", imdb: "tt0085382" },
+           { title: "Detroit Rock City", imdb: "tt0138462" },
+           { title: "Good Burger", imdb: "tt0119215" },
+           { title: "The Cable Guy", imdb: "tt0115798" },
+           { title: "Hard Target", imdb: "tt0107076" },
+           { title: "The Room", imdb: "tt0368226" }
        ];
 
        // Expanded list of popular movies for recommendations.
@@ -927,15 +935,18 @@
        let lastSpunMovieDetailedInfo = null; // Global to store info of last spun movie for recommendations
 
        // DOM Elements
-       const wheel = document.getElementById("wheel3d");
-       const spinBtn = document.getElementById("spin");
-       const resultDiv = document.getElementById("result");
+      const resultDiv = document.getElementById("result");
        const removeSelect = document.getElementById("removeMovieSelect");
        const addForm = document.getElementById("addMovieForm");
        const movieTitleInput = document.getElementById("movieTitle"); // Renamed for clarity
        const historyList = document.getElementById("history");
        const toggleEditLink = document.getElementById("toggleEdit");
        const editSection = document.getElementById("editSection");
+       const toggleHistoryLink = document.getElementById("toggleHistory");
+       const historySection = document.getElementById("historySection");
+       const toggleRecommendationsLink = document.getElementById("toggleRecommendations");
+       const recommendationsSection = document.getElementById("recommendedMoviesSection");
+       const resetPackButton = document.getElementById("resetPackButton");
        const confettiContainer = document.getElementById("confetti-container");
        const toastContainer = document.getElementById("toast-container");
        const addMovieSpinner = document.getElementById("addMovieSpinner");
@@ -944,50 +955,18 @@
        const loadingRecommendationsText = document.getElementById("loadingRecommendations");
 
 
-       let currentRotation = 0;
-       let spinning = false;
-       let audioContextResumed = false; // Flag to track audio context state
-       let autocompleteTimeout = null; // For debouncing autocomplete
-
-       // Tone.js setup for sounds
-       const spinSound = new Tone.Synth({
-           oscillator: { type: "sawtooth" },
-           envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.5 },
-           volume: -10
-       }).toDestination();
-
-       const winSound = new Tone.Synth({
-           oscillator: { type: "sine" },
-           envelope: { attack: 0.02, decay: 0.2, sustain: 0.1, release: 0.8 },
-           volume: -8
-       }).toDestination();
-
-       /**
-        * Resumes the Tone.js audio context on the first user interaction.
-        * This is necessary due to browser autoplay policies.
-        */
-       function resumeAudioContext() {
-           if (!audioContextResumed) {
-               Tone.start().then(() => {
-                   console.log("AudioContext resumed!");
-                   audioContextResumed = true;
-               }).catch(e => console.error("Error resuming AudioContext:", e));
-           }
-       }
-
-       // Attach resumeAudioContext to relevant user interaction events
-       document.addEventListener('click', resumeAudioContext, { once: true });
-       document.addEventListener('touchstart', resumeAudioContext, { once: true });
+      let autocompleteTimeout = null; // For debouncing autocomplete
 
        /**
         * Fetches movie data from the OMDb API.
-        * @param {string} title - The title of the movie to search for.
-        * @returns {Promise<Object>} A promise that resolves with movie data (title, runtime, poster, director)
-        * or a fallback object if not found/error.
+        * @param {Object} entry - Movie entry with at least a title and optional imdb id.
+        * @returns {Promise<Object>} Movie data (title, runtime, poster, director).
         */
-       async function fetchMovieData(title) {
+       async function fetchMovieData(entry) {
            const apiKey = "225d3569"; // OMDb API Key
-           const url = `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(title)}`;
+           const url = entry.imdb ?
+               `https://www.omdbapi.com/?apikey=${apiKey}&i=${entry.imdb}` :
+               `https://www.omdbapi.com/?apikey=${apiKey}&t=${encodeURIComponent(entry.title)}`;
            try {
                const res = await fetch(url);
                const data = await res.json();
@@ -997,7 +976,9 @@
                        title: data.Title,
                        runtime: data.Runtime && data.Runtime !== "N/A" ? data.Runtime : "–",
                        poster: data.Poster && data.Poster !== "N/A" ? data.Poster : null,
-                       Director: data.Director && data.Director !== "N/A" ? data.Director : null // Added Director
+                       Director: data.Director && data.Director !== "N/A" ? data.Director : null,
+                       year: data.Year && data.Year !== "N/A" ? data.Year : null,
+                       description: data.Plot && data.Plot !== "N/A" ? data.Plot : null
                    };
                } else {
                    console.warn(`Movie not found or error for "${title}": ${data.Error}`);
@@ -1031,129 +1012,13 @@
        }
 
        /**
-        * Dynamically builds the slices of the 3D wheel based on the 'entries' array.
+        * Previously built the spinning wheel slices.
+        * With the wheel removed, this now just saves the list to storage.
         */
        function buildWheel() {
-           // Remove all existing slices, keeping only the spin button
-           Array.from(wheel.children).forEach(child => {
-               if (child.id !== "spin") {
-                   wheel.removeChild(child);
-               }
-           });
-
-           if (entries.length === 0) {
-               // If no entries, display a message or a blank wheel
-               const noMoviesSlice = document.createElement("div");
-               noMoviesSlice.className = "slice";
-               noMoviesSlice.style.transform = `rotate(0deg) skewY(0deg)`; // Full circle
-               noMoviesSlice.style.backgroundColor = '#555';
-               noMoviesSlice.style.backgroundImage = `url('https://placehold.co/150x220/555555/ffffff?text=No+Movies+Yet!')`;
-               wheel.insertBefore(noMoviesSlice, spinBtn);
-               return;
-           }
-
-           const sliceDeg = 360 / entries.length;
-
-           entries.forEach((entry, i) => {
-               const slice = document.createElement("div");
-               slice.className = "slice";
-               slice.style.transform = `
-                   rotate(${i * sliceDeg}deg)
-                   skewY(${90 - sliceDeg}deg)
-               `;
-               // Set background image for the slice
-               if (entry.poster) {
-                   slice.style.backgroundImage = `url('${entry.poster}')`;
-               } else {
-                   // Fallback to a solid color and placeholder image if no poster
-                   const fallbackColor = (i % 2 === 0) ? '#3498db' : '#e74c3c';
-                   slice.style.backgroundColor = fallbackColor;
-                   slice.style.backgroundImage = `url('https://placehold.co/150x220/${fallbackColor.substring(1)}/ffffff?text=No+Poster')`;
-               }
-               wheel.insertBefore(slice, spinBtn); // Insert slices before the spin button
-           });
+           localStorage.setItem("movieEntries", JSON.stringify(entries));
        }
 
-       /**
-        * Handles the wheel spinning logic, selects a winner, and displays the result.
-        */
-       function spinWheel() {
-           if (spinning) return; // Prevent multiple simultaneous spins
-           if (entries.length === 0) {
-               showToast("Please add some movies first!", "error");
-               return;
-           }
-
-           spinning = true;
-           spinBtn.disabled = true; // Disable button during spin
-           spinSound.triggerAttack("C4", Tone.now(), 0.5); // Start spin sound
-
-           const sliceDeg = 360 / entries.length;
-           const winnerIndex = Math.floor(Math.random() * entries.length);
-           const rotationOffset = 360 * 5; // Ensure at least 5 full spins for visual effect
-           const targetAngleForWinner = winnerIndex * sliceDeg;
-           // Calculate final rotation to center the winning slice under the needle
-           const finalRotation = rotationOffset - targetAngleForWinner - (sliceDeg / 2);
-
-           // Add a small random offset to make each spin slightly different
-           const randomOffset = Math.random() * (sliceDeg * 0.8) - (sliceDeg * 0.4); // +/- 40% of a slice
-           currentRotation = finalRotation + randomOffset;
-
-           // Apply rotation with CSS transition
-           wheel.style.transition = 'transform 4s ease-out';
-           wheel.style.transform = `rotate(${currentRotation}deg)`;
-
-           // After the spin animation completes
-           setTimeout(async () => { // Made setTimeout async
-               spinSound.triggerRelease(Tone.now()); // Stop spin sound
-               winSound.triggerAttackRelease("C5", "8n", Tone.now()); // Play win sound
-
-               const winner = entries[winnerIndex];
-               // Fetch full details for the winner to get director for recommendations
-               const winnerFullDetails = await fetchMovieData(winner.title);
-               lastSpunMovieDetailedInfo = winnerFullDetails; // Store for recommendations
-
-               let html = `<p>🎉 You got: <strong>${winnerFullDetails.title}</strong></p>`;
-               if (winnerFullDetails.runtime && winnerFullDetails.runtime !== "–") html += `<p><em>${winnerFullDetails.runtime}</em></p>`;
-               
-               // Use a fallback image if no poster is available
-               const posterSrc = winnerFullDetails.poster || `https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster`;
-               html += `<img src="${posterSrc}" alt="${winnerFullDetails.title} poster" onerror="this.onerror=null;this.src='https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster';"/>`;
-               
-               // Add the "Remove from List" button
-               html += `<button class="remove-from-result-btn" data-movie-title="${winnerFullDetails.title}">Remove from List</button>`;
-
-               resultDiv.innerHTML = html;
-               resultDiv.classList.add('show'); // Show result with animation
-
-               // Add event listener for the new remove button
-               resultDiv.querySelector('.remove-from-result-btn').addEventListener('click', (e) => {
-                   const titleToRemove = e.target.dataset.movieTitle;
-                   removeMovieByTitle(titleToRemove);
-               });
-
-               addToHistory(winnerFullDetails.title, winnerFullDetails.runtime, winnerFullDetails.poster);
-
-               spinning = false;
-               spinBtn.disabled = false; // Re-enable button
-
-               // --- FIX: Reset wheel transform for smoother subsequent spins ---
-               // Calculate the effective rotation angle (0-359 degrees)
-               const effectiveRotation = currentRotation % 360;
-               // Temporarily disable transition
-               wheel.style.transition = 'none';
-               // Apply the effective rotation
-               wheel.style.transform = `rotate(${effectiveRotation}deg)`;
-               // Re-enable transition for the next spin by requesting animation frame
-               requestAnimationFrame(() => {
-                   wheel.style.transition = 'transform 4s ease-out';
-               });
-               // --- END FIX ---
-
-               triggerConfetti(); // Trigger confetti effect
-               loadRecommendedMovies(); // Reload recommendations after a spin
-           }, 4000); // Match this timeout to the CSS transition duration
-       }
 
        /**
         * Removes a movie from the entries list by its title.
@@ -1326,7 +1191,7 @@
            recommendedMoviesListDiv.innerHTML = '';
 
            const recommendations = [];
-           const processedTitles = new Set(entries.map(e => e.title.toLowerCase())); // Titles already on wheel
+          const processedTitles = new Set(entries.map(e => e.title.toLowerCase())); // Titles already in list
            const addedToRecommendations = new Set(); // Titles already added to current recommendations
 
            let targetDirectors = [];
@@ -1351,10 +1216,10 @@
                for (const title of popularMovieTitlesForRecommendations) {
                    if (recommendations.length >= 5) break; // Limit to 5 main recommendations
                    if (processedTitles.has(title.toLowerCase()) || addedToRecommendations.has(title.toLowerCase())) {
-                       continue; // Skip if already on wheel or already considered for recommendations
+                     continue; // Skip if already in list or already considered for recommendations
                    }
 
-                   const movieFullDetails = await fetchMovieData(title);
+                   const movieFullDetails = await fetchMovieData({ title });
                    if (movieFullDetails.title && movieFullDetails.Director && movieFullDetails.Director.toLowerCase() === director) {
                        recommendations.push(movieFullDetails);
                        addedToRecommendations.add(movieFullDetails.title.toLowerCase());
@@ -1367,9 +1232,9 @@
                for (const title of popularMovieTitlesForRecommendations) {
                    if (recommendations.length >= 5) break; // Limit to 5 main recommendations
                    if (processedTitles.has(title.toLowerCase()) || addedToRecommendations.has(title.toLowerCase())) {
-                       continue; // Skip if already on wheel or already recommended
+                     continue; // Skip if already in list or already recommended
                    }
-                   const movieFullDetails = await fetchMovieData(title);
+                   const movieFullDetails = await fetchMovieData({ title });
                    if (movieFullDetails.title) {
                        recommendations.push(movieFullDetails);
                        addedToRecommendations.add(movieFullDetails.title.toLowerCase());
@@ -1391,7 +1256,7 @@
                            <strong>${movie.title}</strong>
                            <span>${movie.runtime}</span>
                        </div>
-                       <button class="add-recommended-btn" data-title="${movie.title}">Add to Wheel</button>
+                       <button class="add-recommended-btn" data-title="${movie.title}">Add to List</button>
                    `;
                    recommendedMoviesListDiv.appendChild(card);
                });
@@ -1400,7 +1265,7 @@
                if (targetDirectors.length > 0) {
                    msg = `No recommendations by director(s) "${targetDirectors.join(', ')}" found in our curated list. Showing general popular movies.`;
                } else {
-                   msg = "No general popular movies could be recommended right now. Try adding movies to your wheel and spinning!";
+                   msg = "No general popular movies could be recommended right now. Try adding movies to your list and opening a pack!";
                }
                recommendedMoviesListDiv.innerHTML = `<p style="text-align: center; color: #b0b0b0;">${msg}</p>`;
            }
@@ -1408,9 +1273,9 @@
            // --- Add the 6th "bad movie" recommendation ---
            if (lowRatedMovieTitles.length > 0) {
                const randomBadMovieTitle = lowRatedMovieTitles[Math.floor(Math.random() * lowRatedMovieTitles.length)];
-               const badMovieData = await fetchMovieData(randomBadMovieTitle);
+               const badMovieData = await fetchMovieData({ title: randomBadMovieTitle });
 
-               if (badMovieData.title && !processedTitles.has(badMovieData.title.toLowerCase())) { // Ensure it's not already on the wheel
+               if (badMovieData.title && !processedTitles.has(badMovieData.title.toLowerCase())) { // Ensure it's not already in the list
                    const badMovieCard = document.createElement('div');
                    badMovieCard.className = 'recommended-movie-card bad-movie-recommendation'; // Add distinct class
                    const posterSrc = badMovieData.poster || `https://placehold.co/60x90/e74c3c/ffffff?text=Bad+Movie`;
@@ -1421,7 +1286,7 @@
                            <span>${badMovieData.runtime}</span>
                            <p style="font-size: 0.8em; color: #ffcc00; margin-top: 5px;">(For a laugh!)</p>
                        </div>
-                       <button class="add-recommended-btn" data-title="${badMovieData.title}">Add to Wheel</button>
+                       <button class="add-recommended-btn" data-title="${badMovieData.title}">Add to List</button>
                    `;
                    recommendedMoviesListDiv.appendChild(badMovieCard);
                    addedToRecommendations.add(badMovieData.title.toLowerCase()); // Prevent duplicates in this session
@@ -1429,20 +1294,20 @@
            }
            // --- End 6th recommendation ---
 
-           // Re-add event listeners for all "Add to Wheel" buttons (including the new bad movie one)
+           // Re-add event listeners for all "Add to List" buttons (including the new bad movie one)
            recommendedMoviesListDiv.querySelectorAll('.add-recommended-btn').forEach(button => {
                button.addEventListener('click', async (e) => {
                    const titleToAdd = e.target.dataset.title;
-                   const movieData = await fetchMovieData(titleToAdd); // Fetch data to ensure consistency
+                   const movieData = await fetchMovieData({ title: titleToAdd }); // Fetch data to ensure consistency
                    if (movieData.title === titleToAdd && !entries.some(entry => entry.title.toLowerCase() === titleToAdd.toLowerCase())) {
                        entries.push(movieData);
                        buildWheel();
                        updateRemoveMenu();
                        localStorage.setItem("movieEntries", JSON.stringify(entries));
-                       showToast(`${movieData.title} added to your wheel!`, "success");
+                       showToast(`${movieData.title} added to your list!`, "success");
                        loadRecommendedMovies(); // Reload recommendations to remove added movie
                    } else if (entries.some(entry => entry.title.toLowerCase() === titleToAdd.toLowerCase())) {
-                       showToast(`${titleToAdd} is already on your wheel.`, "info");
+                       showToast(`${titleToAdd} is already on your list.`, "info");
                    } else {
                        showToast(`Could not add "${titleToAdd}".`, "error");
                    }
@@ -1452,24 +1317,23 @@
 
 
        // --- Event Listeners ---
-       spinBtn.addEventListener("click", spinWheel);
+
 
        addForm.addEventListener("submit", async (e) => {
            e.preventDefault();
            const title = movieTitleInput.value.trim();
            if (title) {
                addMovieSpinner.style.display = 'inline-block'; // Show spinner
-               spinBtn.disabled = true; // Disable spin button during fetch
                autocompleteSuggestionsDiv.innerHTML = ''; // Clear suggestions
                try {
                    // Check if movie is already in the list
                    const isOnWheel = entries.some(entry => entry.title.toLowerCase() === title.toLowerCase());
                    if (isOnWheel) {
-                       showToast(`${title} is already on your wheel.`, "info");
+                       showToast(`${title} is already on your list.`, "info");
                        return;
                    }
 
-                   const movieData = await fetchMovieData(title);
+                   const movieData = await fetchMovieData({ title });
                    if (movieData.title === title) { // Check if the title matches (i.e., not a generic fallback)
                        entries.push(movieData);
                        showToast(`${movieData.title} added!`, "success");
@@ -1487,7 +1351,6 @@
                    showToast("Error adding movie. Please try again.", "error");
                } finally {
                    addMovieSpinner.style.display = 'none'; // Hide spinner
-                   spinBtn.disabled = false; // Re-enable spin button
                }
            } else {
                showToast("Please enter a movie title.", "error");
@@ -1508,7 +1371,7 @@
            if (!isNaN(idx) && idx >= 0 && idx < entries.length) {
                const removedMovieTitle = entries[idx].title;
                entries.splice(idx, 1); // Remove movie from array
-               buildWheel(); // Rebuild wheel with updated entries
+               buildWheel(); // Save updated entries
                updateRemoveMenu(); // Update remove dropdown
                localStorage.setItem("movieEntries", JSON.stringify(entries)); // Save to local storage
                showToast(`${removedMovieTitle} removed.`, "info");
@@ -1528,9 +1391,25 @@
            }
        });
 
+       toggleHistoryLink.addEventListener("click", (e) => {
+           e.preventDefault();
+           const expanded = historySection.classList.toggle("expanded");
+           toggleHistoryLink.textContent = expanded ? "➖ Hide Pack History" : "➕ Show Pack History";
+       });
+
+       toggleRecommendationsLink.addEventListener("click", (e) => {
+           e.preventDefault();
+           const expanded = recommendationsSection.classList.toggle("expanded");
+           toggleRecommendationsLink.textContent = expanded ? "➖ Hide Recommendations" : "➕ Show Recommendations";
+       });
+
+       if (resetPackButton) {
+           resetPackButton.addEventListener("click", resetPack);
+       }
+
        /**
-        * Initializes the application: loads movies, fetches data for defaults,
-        * builds the wheel, and loads history.
+        * Initializes the application: loads movies, fetches any missing data,
+        * saves them, and loads history.
         */
        async function initializeApp() {
            const storedEntries = JSON.parse(localStorage.getItem("movieEntries") || "[]");
@@ -1542,7 +1421,7 @@
                if (entry.poster && entry.runtime && entry.title && entry.Director !== undefined) {
                    return entry;
                } else if (entry.title) {
-                   return await fetchMovieData(entry.title);
+                   return await fetchMovieData(entry);
                }
                return null; // Should not happen if data is well-formed
            }).filter(Boolean); // Filter out any nulls
@@ -1561,10 +1440,162 @@
        }
 
        // Initialize the app when the window loads
-       window.onload = initializeApp;
-   </script>
-   <script>
-   if ('serviceWorker' in navigator) {
+        window.onload = initializeApp;
+    </script>
+
+    <script>
+        // --- Movie Pack Randomizer ---
+        const placeholderMovies = [
+            { title: 'Galaxy Raiders', year: 1984, description: 'Space heroes save the universe.' },
+            { title: 'Neon Nights', year: 1992, description: 'Cyberpunk adventures in a glowing city.' },
+            { title: 'Kung Fu Koalas', year: 1987, description: 'Martial arts marsupials fight crime.' },
+            { title: 'Robot Rebellion', year: 2001, description: 'AI uprising threatens humanity.' },
+            { title: 'Pirate Planet', year: 1978, description: 'Swashbucklers in outer space.' },
+            { title: 'Retro Rampage', year: 1995, description: 'Gamers battle through arcade worlds.' },
+            { title: 'Haunted High', year: 1989, description: 'Teens uncover ghosts at school.' },
+            { title: 'Samurai Suburbia', year: 1999, description: 'Ancient warriors in modern times.' },
+            { title: 'Laser Llamas', year: 1983, description: 'Llamas wield lasers to defend Earth.' },
+            { title: 'Quantum Quest', year: 2010, description: 'Scientists journey through time.' }
+        ];
+
+        function randomGradient() {
+            const colors = ['#ff007c', '#00ffd5', '#ff9900', '#00a1ff', '#a0ff00', '#ff00e6', '#ff3421', '#21ffb9', '#6542ff'];
+            const c1 = colors[Math.floor(Math.random()*colors.length)];
+            const c2 = colors[Math.floor(Math.random()*colors.length)];
+            return `linear-gradient(135deg, ${c1}, ${c2})`;
+        }
+
+        function pickRandomMovies(n) {
+            const pool = entries && entries.length > 0 ? entries : placeholderMovies;
+            const chosen = [];
+            const used = new Set();
+            if (pool.length <= n) {
+                return pool.slice(0, n).map(m => ({ ...m }));
+            }
+            while (chosen.length < n) {
+                const idx = Math.floor(Math.random() * pool.length);
+                if (!used.has(idx)) {
+                    used.add(idx);
+                    chosen.push({ ...pool[idx] });
+                }
+            }
+            return chosen;
+        }
+
+        function initPacks() {
+            const carousel = document.getElementById('packCarousel');
+            if (!carousel) return;
+            for (let i = 0; i < 3; i++) {
+                const p = document.createElement('div');
+                p.className = 'pack';
+                p.style.background = randomGradient();
+                p.addEventListener('click', () => openPack(p));
+                carousel.appendChild(p);
+            }
+        }
+
+        let selectedMovies = [];
+        let packOpened = false;
+
+        function openPack(packEl) {
+            if (packOpened) return;
+            packOpened = true;
+            packEl.classList.add('selected');
+            document.querySelectorAll('.pack').forEach(p => p.style.pointerEvents='none');
+            setTimeout(() => {
+                packEl.classList.add('opening');
+                setTimeout(showCards, 600);
+            }, 100);
+        }
+
+        function showCards() {
+            selectedMovies = pickRandomMovies(5);
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+            selectedMovies.forEach((movie) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                const posterStyle = movie.poster ?
+                    `background-image:url('${movie.poster}');background-size:cover;background-position:center;` :
+                    `background:${randomGradient()}`;
+                card.innerHTML = `<div class="card-inner"><div class="card-back">🎬</div><div class="card-front" style="${posterStyle}"></div></div>`;
+                card.addEventListener('click', () => revealMovie(card, movie));
+                container.appendChild(card);
+            });
+            document.getElementById('packOpenArea').style.display = 'block';
+            setTimeout(() => revealAllOnce(container.children), 700);
+        }
+
+        function revealAllOnce(cards) {
+            cards = Array.from(cards);
+            cards.forEach(c => c.classList.add('flip'));
+            setTimeout(() => {
+                cards.forEach(c => c.classList.remove('flip'));
+                shuffleCards(cards);
+            }, 1200);
+        }
+
+        function shuffleCards(cards) {
+            cards.forEach(c => c.style.order = Math.floor(Math.random()*5));
+        }
+
+        function resetPack() {
+            const carousel = document.getElementById('packCarousel');
+            const container = document.getElementById('cardsContainer');
+            const info = document.getElementById('selectedMovieInfo');
+            carousel.innerHTML = '';
+            container.innerHTML = '';
+            info.innerHTML = '';
+            document.getElementById('packOpenArea').style.display = 'none';
+            packOpened = false;
+            initPacks();
+        }
+
+        async function revealMovie(card, movie) {
+            if (card.classList.contains('chosen')) return;
+            card.classList.add('flip', 'chosen');
+            triggerConfetti();
+            const info = document.getElementById('selectedMovieInfo');
+
+            let details = movie;
+            if (!movie.year || !movie.description) {
+                try {
+                    const fetched = await fetchMovieData(movie);
+                    details = { ...movie, ...fetched };
+                } catch(e) {
+                    console.error('Error fetching details for', movie.title, e);
+                }
+            }
+
+            const posterSrc = details.poster || `https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster`;
+            info.innerHTML = `
+                <img src="${posterSrc}" alt="${details.title} poster" onerror="this.onerror=null;this.src='https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster';">
+                <h3>${details.title}${details.year ? ` (${details.year})` : ''}</h3>
+                ${details.description ? `<p>${details.description}</p>` : ''}
+                <button id="add-selected-btn" class="add-recommended-btn" style="margin-top:10px;">Add to List</button>
+            `;
+            document.getElementById('add-selected-btn').addEventListener('click', async () => {
+                if (!entries.some(e => e.title.toLowerCase() === details.title.toLowerCase())) {
+                    entries.push(details);
+                    buildWheel();
+                    updateRemoveMenu();
+                    localStorage.setItem("movieEntries", JSON.stringify(entries));
+                    showToast(`${details.title} added to your list!`, "success");
+                } else {
+                    showToast(`${details.title} is already on your list.`, "info");
+                }
+            });
+            info.scrollIntoView({behavior:'smooth'});
+            lastSpunMovieDetailedInfo = details;
+            addToHistory(details.title, details.runtime || '–', details.poster);
+            loadRecommendedMovies();
+        }
+
+        document.addEventListener('DOMContentLoaded', initPacks);
+    </script>
+
+    <script>
+    if ('serviceWorker' in navigator) {
      window.addEventListener('load', function() {
        navigator.serviceWorker.register('service-worker.js', {
          scope: './'

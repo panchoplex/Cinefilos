@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>FotoFiesta</title>
+  <meta name="description" content="A playful photo booth PWA for quick snaps and delayed reveals.">
+  <meta name="theme-color" content="#111">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #111;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      padding: 1rem;
+      text-align: center;
+      background: #1f1f1f;
+    }
+    main {
+      flex: 1;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hidden { display: none; }
+    #camera-preview { width: 100%; max-width: 320px; background: #000; }
+    #cruda-gallery img { width: 80px; margin: 4px; }
+    #qrContainer canvas { margin-top: 10px; }
+    #setup input { margin: 0.5rem; padding: 0.4rem; }
+    #setup button { padding: 0.5rem 1rem; margin: 0.5rem; }
+    #participants div { display: inline-flex; align-items: center; margin: 0 4px 4px 0; background:#222; padding:4px 8px; border-radius:12px; font-size:0.8rem; }
+    #participants span { margin-left:4px; }
+    .floating-btn { position: fixed; bottom: 20px; right: 20px; background:#0af; color:#fff; width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 8px rgba(0,0,0,0.4); }
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; }
+    .modal-content{ background:#111; padding:20px; border-radius:8px; width:90%; max-width:320px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FotoFiesta</h1>
+  </header>
+  <main>
+    <div id="setup">
+      <label>Username <input id="usernameInput" type="text"></label>
+      <div id="createSessionArea">
+        <label>Reveal time <input type="datetime-local" id="revealInput"></label>
+        <button id="createSessionBtn">Create Session</button>
+      </div>
+      <div id="joinSessionArea" class="hidden">
+        <button id="joinSessionBtn">Join Session</button>
+      </div>
+    </div>
+
+    <div id="sessionArea" class="hidden">
+      <div id="sessionInfo"></div>
+      <div id="participants"></div>
+      <video id="camera-preview" autoplay playsinline></video>
+      <canvas id="capture-canvas" class="hidden"></canvas>
+      <button id="takePhotoBtn">Take Photo</button>
+      <div id="qrContainer"></div>
+      <div id="cruda-gallery"></div>
+    </div>
+  </main>
+
+  <div id="inviteBtn" class="floating-btn">&#128101;</div>
+
+  <div id="inviteModal" class="modal">
+    <div class="modal-content">
+      <h3>Invite to Session</h3>
+      <p id="inviteLink"></p>
+      <button id="copyInvite">Copy Link</button>
+      <div id="inviteQr"></div>
+      <button id="closeInvite">Close</button>
+    </div>
+  </div>
+
+  <script src="fotofiesta.js"></script>
+</body>
+</html>

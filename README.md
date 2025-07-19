@@ -156,3 +156,17 @@ For issues or questions about the PWA implementation, check:
 - Manifest tab for PWA installation criteria
 
 # Cinefilos
+
+## FotoFiesta Subpage
+A lightweight photo booth experience is available in the `fotofiesta` folder. The page works completely offline and can be deployed on GitHub Pages just like the main app.
+
+### Features
+- **Sessions with QR invites**: create a session with a reveal date/time and invite others by QR code.
+- **Participant profiles**: each session tracks who joined so photos show the photographer.
+- **Fotos d la Cruda**: photos remain hidden until the chosen reveal time.
+- Works as a PWA with its own manifest and service worker.
+
+### Usage
+Open `fotofiesta/index.html` in your browser or deploy the entire repository to GitHub Pages and navigate to `/fotofiesta/`.
+Create a session, then share the generated QR code or link so others can join the same gallery.
+You can also access FotoFiesta from the main page via the "Open FotoFiesta" button.
