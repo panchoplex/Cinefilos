@@ -1654,9 +1654,16 @@
         function pickRandomMovies(n) {
             const pool = entries && entries.length > 0 ? entries : placeholderMovies;
             const chosen = [];
-            for (let i = 0; i < n; i++) {
-                const m = pool[Math.floor(Math.random() * pool.length)];
-                chosen.push({ ...m });
+            const used = new Set();
+            if (pool.length <= n) {
+                return pool.slice(0, n).map(m => ({ ...m }));
+            }
+            while (chosen.length < n) {
+                const idx = Math.floor(Math.random() * pool.length);
+                if (!used.has(idx)) {
+                    used.add(idx);
+                    chosen.push({ ...pool[idx] });
+                }
             }
             return chosen;
         }
@@ -1739,7 +1746,19 @@
                 <img src="${posterSrc}" alt="${details.title} poster" onerror="this.onerror=null;this.src='https://placehold.co/150x220/3a3a5e/ffffff?text=No+Poster';">
                 <h3>${details.title}${details.year ? ` (${details.year})` : ''}</h3>
                 ${details.description ? `<p>${details.description}</p>` : ''}
+                <button id="add-selected-btn" class="add-recommended-btn" style="margin-top:10px;">Add to List</button>
             `;
+            document.getElementById('add-selected-btn').addEventListener('click', async () => {
+                if (!entries.some(e => e.title.toLowerCase() === details.title.toLowerCase())) {
+                    entries.push(details);
+                    buildWheel();
+                    updateRemoveMenu();
+                    localStorage.setItem("movieEntries", JSON.stringify(entries));
+                    showToast(`${details.title} added to your list!`, "success");
+                } else {
+                    showToast(`${details.title} is already on your list.`, "info");
+                }
+            });
             info.scrollIntoView({behavior:'smooth'});
             lastSpunMovieDetailedInfo = details;
             addToHistory(details.title, details.runtime || '–', details.poster);
