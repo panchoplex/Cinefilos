@@ -162,8 +162,8 @@ A lightweight photo booth experience is available in the `fotofiesta` folder. Th
 
 ### Features
 - **Sessions with QR invites**: create a session with a reveal date/time and invite others by QR code.
+- **Participant profiles**: each session tracks who joined so photos show the photographer.
 - **Fotos d la Cruda**: photos remain hidden until the chosen reveal time.
-- **Username tagging**: each picture stores the name of the photographer.
 - Works as a PWA with its own manifest and service worker.
 
 ### Usage

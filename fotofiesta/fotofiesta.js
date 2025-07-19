@@ -11,6 +11,13 @@ const joinSessionArea = document.getElementById('joinSessionArea');
 const qrContainer = document.getElementById('qrContainer');
 const sessionInfo = document.getElementById('sessionInfo');
 const takePhotoBtn = document.getElementById('takePhotoBtn');
+const participantsDiv = document.getElementById('participants');
+const inviteBtn = document.getElementById('inviteBtn');
+const inviteModal = document.getElementById('inviteModal');
+const inviteLinkP = document.getElementById('inviteLink');
+const copyInviteBtn = document.getElementById('copyInvite');
+const inviteQrDiv = document.getElementById('inviteQr');
+const closeInviteBtn = document.getElementById('closeInvite');
 
 let currentSessionId = null;
 let currentSession = null;
@@ -63,6 +70,16 @@ function loadGallery() {
   });
 }
 
+function updateParticipants() {
+  participantsDiv.innerHTML = '';
+  (currentSession.participants || []).forEach(name => {
+    const div = document.createElement('div');
+    const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+    div.innerHTML = `<span>${initials}</span><span>${name}</span>`;
+    participantsDiv.appendChild(div);
+  });
+}
+
 function generateQr() {
   qrContainer.innerHTML = '';
   const url = `${location.origin}${location.pathname}?session=${currentSessionId}`;
@@ -71,14 +88,28 @@ function generateQr() {
   });
 }
 
+function openInviteModal() {
+  const url = `${location.origin}${location.pathname}?session=${currentSessionId}`;
+  inviteLinkP.textContent = url;
+  inviteQrDiv.innerHTML = '';
+  QRCode.toCanvas(url, {width:200}, (err, canvas)=>{ if(!err) inviteQrDiv.appendChild(canvas); });
+  inviteModal.style.display = 'flex';
+}
+
 function startSession(isCreator) {
   setupDiv.classList.add('hidden');
   sessionArea.classList.remove('hidden');
   startCamera();
   sessionInfo.textContent = 'Reveal at ' + new Date(currentSession.revealAt).toLocaleString();
-  if (isCreator) generateQr();
-  else qrContainer.classList.add('hidden');
+  if (isCreator) {
+    generateQr();
+    inviteBtn.style.display = 'flex';
+  } else {
+    qrContainer.classList.add('hidden');
+    inviteBtn.style.display = 'none';
+  }
   loadGallery();
+  updateParticipants();
 }
 
 createSessionBtn.onclick = () => {
@@ -88,9 +119,10 @@ createSessionBtn.onclick = () => {
     alert('Enter username and reveal time');
     return;
   }
+  localStorage.setItem('ff_username', username);
   currentSessionId = 's' + Date.now();
   const sessions = getSessions();
-  sessions[currentSessionId] = { revealAt, photos: [], creator: username };
+  sessions[currentSessionId] = { revealAt, photos: [], creator: username, participants: [username] };
   saveSessions(sessions);
   currentSession = sessions[currentSessionId];
   startSession(true);
@@ -99,9 +131,15 @@ createSessionBtn.onclick = () => {
 joinSessionBtn.onclick = () => {
   username = usernameInput.value.trim();
   if (!username) { alert('Enter username'); return; }
+  localStorage.setItem('ff_username', username);
   const sessions = getSessions();
   currentSession = sessions[currentSessionId];
   if (!currentSession) { alert('Session not found'); return; }
+  if (!currentSession.participants) currentSession.participants = [];
+  if (!currentSession.participants.includes(username)) {
+    currentSession.participants.push(username);
+    saveSessions(sessions);
+  }
   startSession(false);
 };
 
@@ -123,6 +161,8 @@ function init() {
     joinSessionArea.classList.remove('hidden');
     document.getElementById('createSessionArea').classList.add('hidden');
   }
+  const savedName = localStorage.getItem('ff_username');
+  if (savedName) usernameInput.value = savedName;
 }
 
 if ('serviceWorker' in navigator) {
@@ -130,3 +170,19 @@ if ('serviceWorker' in navigator) {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+inviteBtn.addEventListener('click', openInviteModal);
+closeInviteBtn.addEventListener('click', () => inviteModal.style.display = 'none');
+copyInviteBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(inviteLinkP.textContent);
+  copyInviteBtn.textContent = 'Copied!';
+  setTimeout(()=>{copyInviteBtn.textContent='Copy Link';},1500);
+});
+
+inviteModal.addEventListener('click', (e) => {
+  if (e.target === inviteModal) inviteModal.style.display = 'none';
+});
+
+usernameInput.addEventListener('change', () => {
+  localStorage.setItem('ff_username', usernameInput.value.trim());
+});
