@@ -358,24 +358,28 @@
 
 
    /* Toggle Edit Link */
-   #toggleEdit {
-       display: block;
-       margin-top: 30px;
-       color: #66bbff;
-       text-decoration: none;
-       cursor: pointer;
-       user-select: none;
-       font-size: 18px;
-       transition: color 0.3s ease, transform 0.2s ease;
-       font-weight: 600;
-       touch-action: manipulation;
-       -webkit-tap-highlight-color: transparent;
-   }
+  #toggleEdit,
+  #toggleHistory,
+  #toggleRecommendations {
+      display: block;
+      margin-top: 30px;
+      color: #66bbff;
+      text-decoration: none;
+      cursor: pointer;
+      user-select: none;
+      font-size: 18px;
+      transition: color 0.3s ease, transform 0.2s ease;
+      font-weight: 600;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+  }
 
-   #toggleEdit:hover {
-       color: #99ddff;
-       transform: translateY(-2px);
-   }
+  #toggleEdit:hover,
+  #toggleHistory:hover,
+  #toggleRecommendations:hover {
+      color: #99ddff;
+      transform: translateY(-2px);
+  }
 
    /* Collapsible Edit Section */
    .collapsible {
@@ -419,7 +423,7 @@
        color: #a0a0a0;
    }
 
-   button[type="submit"], #removeMovieButton, .add-recommended-btn {
+   button[type="submit"], #removeMovieButton, .add-recommended-btn, #resetPackButton {
        cursor: pointer;
        background: linear-gradient(145deg, #3498db, #2980b9);
        border: none;
@@ -429,7 +433,7 @@
        text-transform: uppercase;
    }
 
-   button[type="submit"]:hover, #removeMovieButton:hover, .add-recommended-btn:hover {
+   button[type="submit"]:hover, #removeMovieButton:hover, .add-recommended-btn:hover, #resetPackButton:hover {
        background: linear-gradient(145deg, #2980b9, #3498db);
        transform: translateY(-2px);
    }
@@ -438,9 +442,17 @@
        background: linear-gradient(145deg, #e74c3c, #c0392b);
    }
 
-   #removeMovieButton:hover {
-       background: linear-gradient(145deg, #c0392b, #e74c3c);
-   }
+  #removeMovieButton:hover {
+      background: linear-gradient(145deg, #c0392b, #e74c3c);
+  }
+
+  #resetPackButton {
+      background: linear-gradient(145deg, #8e44ad, #6c3483);
+  }
+
+  #resetPackButton:hover {
+      background: linear-gradient(145deg, #6c3483, #8e44ad);
+  }
 
    /* History Section */
    #history {
@@ -697,7 +709,7 @@
        #result img {
            max-height: 120px;
        }
-       .collapsible, #history, #recommendedMoviesSection {
+       .collapsible, #historySection, #recommendedMoviesSection {
            max-width: 95%;
            padding: 15px;
        }
@@ -883,11 +895,22 @@
 
    <h1>CINEFILOS</h1>
    <div id="result"></div>
-   <div id="confetti-container"></div> <!-- Confetti container -->
-   <div id="toast-container"></div> <!-- Toast notification container -->
+  <div id="confetti-container"></div> <!-- Confetti container -->
+  <div id="toast-container"></div> <!-- Toast notification container -->
 
-   <h2>📜 Pack History</h2>
-   <ul id="history"></ul>
+  <h2>🎲 Random Movie Pack Opening</h2>
+  <div id="packCarousel" class="pack-carousel"></div>
+  <div id="packOpenArea" style="display:none;">
+      <div id="cardsContainer" class="cards-container"></div>
+      <div id="selectedMovieInfo" class="selected-movie-info"></div>
+      <button id="resetPackButton">Reset Pack</button>
+  </div>
+
+  <a href="#" id="toggleHistory">➖ Hide Pack History</a>
+  <div id="historySection" class="collapsible expanded">
+      <h2>📜 Pack History</h2>
+      <ul id="history"></ul>
+  </div>
 
    <a href="#" id="toggleEdit">➕ Show Add/Remove Movies & Recommendations</a>
    <div id="editSection" class="collapsible">
@@ -902,7 +925,8 @@
        <button id="removeMovieButton">Remove Selected Movie</button>
    </div>
 
-  <div id="recommendedMoviesSection">
+  <a href="#" id="toggleRecommendations">➖ Hide Recommendations</a>
+  <div id="recommendedMoviesSection" class="collapsible expanded">
       <h2>✨ Recommended Movies</h2>
       <div id="recommendedMoviesList">
           <!-- Recommended movies will be loaded here by JS -->
@@ -910,12 +934,7 @@
       </div>
   </div>
 
-  <h2>🎲 Random Movie Pack Opening</h2>
-  <div id="packCarousel" class="pack-carousel"></div>
-  <div id="packOpenArea" style="display:none;">
-      <div id="cardsContainer" class="cards-container"></div>
-      <div id="selectedMovieInfo" class="selected-movie-info"></div>
-  </div>
+
 
    <script>
        // PWA Installation Logic
@@ -1037,6 +1056,11 @@
        const historyList = document.getElementById("history");
        const toggleEditLink = document.getElementById("toggleEdit");
        const editSection = document.getElementById("editSection");
+       const toggleHistoryLink = document.getElementById("toggleHistory");
+       const historySection = document.getElementById("historySection");
+       const toggleRecommendationsLink = document.getElementById("toggleRecommendations");
+       const recommendationsSection = document.getElementById("recommendedMoviesSection");
+       const resetPackButton = document.getElementById("resetPackButton");
        const confettiContainer = document.getElementById("confetti-container");
        const toastContainer = document.getElementById("toast-container");
        const addMovieSpinner = document.getElementById("addMovieSpinner");
@@ -1593,6 +1617,22 @@
            }
        });
 
+       toggleHistoryLink.addEventListener("click", (e) => {
+           e.preventDefault();
+           const expanded = historySection.classList.toggle("expanded");
+           toggleHistoryLink.textContent = expanded ? "➖ Hide Pack History" : "➕ Show Pack History";
+       });
+
+       toggleRecommendationsLink.addEventListener("click", (e) => {
+           e.preventDefault();
+           const expanded = recommendationsSection.classList.toggle("expanded");
+           toggleRecommendationsLink.textContent = expanded ? "➖ Hide Recommendations" : "➕ Show Recommendations";
+       });
+
+       if (resetPackButton) {
+           resetPackButton.addEventListener("click", resetPack);
+       }
+
        /**
         * Initializes the application: loads movies, fetches data for defaults,
         * builds the wheel, and loads history.
@@ -1723,6 +1763,18 @@
 
         function shuffleCards(cards) {
             cards.forEach(c => c.style.order = Math.floor(Math.random()*5));
+        }
+
+        function resetPack() {
+            const carousel = document.getElementById('packCarousel');
+            const container = document.getElementById('cardsContainer');
+            const info = document.getElementById('selectedMovieInfo');
+            carousel.innerHTML = '';
+            container.innerHTML = '';
+            info.innerHTML = '';
+            document.getElementById('packOpenArea').style.display = 'none';
+            packOpened = false;
+            initPacks();
         }
 
         async function revealMovie(card, movie) {
